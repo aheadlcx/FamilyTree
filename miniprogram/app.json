@@ -1,0 +1,57 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/welcome/index",
+    "pages/tree-view/index",
+    "pages/member-list/index",
+    "pages/member-detail/index",
+    "pages/member-edit/index",
+    "pages/timeline/index",
+    "pages/event-edit/index",
+    "pages/family-admin/index",
+    "pages/stats/index",
+    "pages/profile/index"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#F6F4EE",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "家族族谱",
+    "backgroundColor": "#F6F4EE",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#9a938a",
+    "selectedColor": "#07C160",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "族谱",
+        "iconPath": "images/tab-tree.png",
+        "selectedIconPath": "images/tab-tree-active.png"
+      },
+      {
+        "pagePath": "pages/member-list/index",
+        "text": "成员",
+        "iconPath": "images/tab-members.png",
+        "selectedIconPath": "images/tab-members-active.png"
+      },
+      {
+        "pagePath": "pages/timeline/index",
+        "text": "大事记",
+        "iconPath": "images/tab-moments.png",
+        "selectedIconPath": "images/tab-moments-active.png"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的",
+        "iconPath": "images/tab-mine.png",
+        "selectedIconPath": "images/tab-mine-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

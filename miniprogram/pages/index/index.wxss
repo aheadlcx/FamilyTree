@@ -1,0 +1,46 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20rpx 24rpx 4rpx;
+}
+.toolbar-family { font-size: 36rpx; font-weight: 700; }
+.toolbar-sub { margin-top: 6rpx; display: flex; align-items: center; }
+.toolbar-right { display: flex; align-items: center; }
+.tool-btn {
+  background: #fff;
+  border: 1rpx solid #ece8e0;
+  color: #5c564d;
+  font-size: 26rpx;
+  padding: 10rpx 24rpx;
+  border-radius: 999rpx;
+  margin-left: 14rpx;
+  display: flex;
+  align-items: center;
+  line-height: 1.4;
+}
+.tool-share {
+  color: #07c160;
+  border-color: #07c160;
+  padding: 10rpx 24rpx;
+}
+.tool-share::after { border: none; }
+
+.tree-scroll {
+  width: 100%;
+  height: calc(100vh - 160rpx);
+}
+.tree-canvas {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100%;
+  padding: 50rpx 40rpx 120rpx;
+  box-sizing: border-box;
+}
+.tree-root {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 60rpx;
+}

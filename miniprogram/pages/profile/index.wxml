@@ -1,0 +1,77 @@
+<!-- 用户卡片 -->
+<view class="card pf-user">
+  <button class="pf-avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+    <image wx:if="{{user && user.avatarUrl}}" class="pf-avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
+    <view wx:else class="pf-avatar pf-avatar-ph">像</view>
+    <view class="pf-avatar-edit">改</view>
+  </button>
+  <view class="pf-user-info">
+    <view class="pf-name" bindtap="editNickname">
+      {{user ? (user.nickname || '未设置昵称') : '微信用户'}}
+      <text class="pf-edit">✎</text>
+    </view>
+    <view class="muted">已通过微信登录验证</view>
+  </view>
+</view>
+
+<!-- 当前家族 -->
+<view class="card">
+  <view class="h2">当前家族</view>
+  <block wx:if="{{ctx}}">
+    <view class="cell" bindtap="goIndex">
+      <view>
+        <view class="cell-title">{{ctx.family.name}}</view>
+        <view class="muted">{{ctx.memberCount}} 位族人<block wx:if="{{selfMemberName}}"> · 我是 {{selfMemberName}}</block></view>
+      </view>
+      <view class="cell-right"><text class="tag tag-gold">{{roleName}}</text><text class="arrow">›</text></view>
+    </view>
+    <view wx:if="{{myFamilies.length > 1}}" class="cell" bindtap="switchFamily">
+      <view class="cell-title">切换家族</view>
+      <view class="cell-right">共 {{myFamilies.length}} 个<text class="arrow">›</text></view>
+    </view>
+    <view wx:if="{{ctx.selfMemberId}}" class="cell" bindtap="goSelfDetail">
+      <view class="cell-title">我的族谱资料</view>
+      <view class="cell-right"><text class="arrow">›</text></view>
+    </view>
+    <view wx:if="{{ctx.role === 'owner' || ctx.role === 'admin'}}" class="cell" bindtap="goAdmin">
+      <view class="cell-title">家族管理<text wx:if="{{ctx.pendingCount}}" class="badge-dot">{{ctx.pendingCount}}</text></view>
+      <view class="cell-right">审批 / 邀请 / 权限<text class="arrow">›</text></view>
+    </view>
+  </block>
+  <view wx:else class="muted" style="padding: 8rpx 0;">
+    你还未加入家族
+  </view>
+  <button wx:if="{{!ctx}}" class="btn btn-primary" bindtap="goWelcome">创建 / 加入家族</button>
+</view>
+
+<!-- 我的申请 -->
+<view wx:if="{{myPending.length}}" class="card">
+  <view class="h2">我的加入申请</view>
+  <view wx:for="{{myPending}}" wx:key="_id" class="cell">
+    <view class="cell-title">{{item.familyName}}</view>
+    <view class="cell-right">
+      <text class="tag {{item.status === 'pending' ? 'tag-gold' : (item.status === 'approved' ? 'tag-green' : 'tag-red')}}">{{item.status === 'pending' ? '审核中' : (item.status === 'approved' ? '已通过' : '已拒绝')}}</text>
+    </view>
+  </view>
+</view>
+
+<!-- 帮助 -->
+<view class="card">
+  <view class="cell" bindtap="toggleHelp">
+    <view class="cell-title">使用帮助</view>
+    <view class="cell-right"><text class="arrow">{{showHelp ? '⌃' : '›'}}</text></view>
+  </view>
+  <view wx:if="{{showHelp}}" class="pf-help">
+    <view class="pf-help-item"><text class="pf-help-k">① 权限说明</text>族主拥有全部权限；管理员可审批、增删成员、管理家族；编辑员可添加/修改族员与大事记；浏览仅可查看。</view>
+    <view class="pf-help-item"><text class="pf-help-k">② 邀请家人</text>在「族谱」页右上角点「邀请」分享给微信好友，或告知邀请码，对方在此页面登录后即可申请加入。</view>
+    <view class="pf-help-item"><text class="pf-help-k">③ 修谱建议</text>先添加始祖（不填父母即为第一世），再依次为每人添加子女，世代数自动计算；配偶通过「编辑资料 → 添加配偶」关联。</view>
+    <view class="pf-help-item"><text class="pf-help-k">④ 数据安全</text>所有数据存于你的私有云开发环境，仅家族成员可见；族主可随时导出 JSON 备份。</view>
+  </view>
+</view>
+
+<view class="card">
+  <button class="btn btn-warn" bindtap="logout">退出登录</button>
+  <view class="muted" style="text-align:center; margin-top: 20rpx;">家族族谱 · 微信云开发版 v1.0</view>
+</view>
+
+<view class="safe-bottom"></view>

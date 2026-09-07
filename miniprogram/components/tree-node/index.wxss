@@ -1,0 +1,118 @@
+.tn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ---------- 夫妻行 ---------- */
+.tn-couple {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+}
+
+.tn-card {
+  width: 150rpx;
+  background: #fff;
+  border: 2rpx solid #e8e2d6;
+  border-radius: 14rpx;
+  padding: 14rpx 10rpx;
+  text-align: center;
+  box-shadow: 0 2rpx 8rpx rgba(80, 60, 20, 0.06);
+}
+.tn-spouse {
+  background: #fbfaf6;
+  border-style: dashed;
+}
+.tn-self {
+  border-color: #07c160;
+  box-shadow: 0 0 0 4rpx rgba(7, 193, 96, 0.18);
+}
+
+.tn-photo {
+  width: 84rpx;
+  height: 84rpx;
+  border-radius: 50%;
+  margin-bottom: 8rpx;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.tn-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: 600;
+}
+.tn-ph.g1 { background: #6da2ff; }
+.tn-ph.g2 { background: #ff9db6; }
+.tn-ph.g0 { background: #c9c2b8; }
+
+.tn-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tn-cross { color: #b5aea3; margin-left: 4rpx; font-weight: 400; }
+.tn-years { font-size: 20rpx; color: #9a938a; }
+.tn-gen { font-size: 18rpx; color: #a4762a; margin-top: 2rpx; }
+
+.tn-link {
+  color: #d8a0a6;
+  font-size: 26rpx;
+  margin: 0 10rpx;
+}
+
+/* ---------- 子女行与连接线 ---------- */
+.tn-children {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+  padding-top: 28rpx;
+}
+.tn-child {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 0 14rpx;
+}
+/* 父母向下的竖线 */
+.tn-children::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4rpx;
+  height: 14rpx;
+  margin-left: -2rpx;
+  background: #d9cba5;
+}
+/* 每个子女：纵向短线 + 横向连接线 */
+.tn-child::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 4rpx;
+  height: 14rpx;
+  margin-left: -2rpx;
+  background: #d9cba5;
+}
+.tn-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4rpx;
+  background: #d9cba5;
+}
+.tn-child:first-child::after { left: 50%; }
+.tn-child:last-child::after { right: 50%; }
+.tn-child:only-child::after { display: none; }

@@ -1,0 +1,24 @@
+.hero { text-align: center; padding: 60rpx 0 20rpx; }
+.hero-title { font-size: 52rpx; font-weight: 700; color: #3b342a; letter-spacing: 8rpx; }
+.hero-sub { color: #a4762a; font-size: 26rpx; margin-top: 10rpx; letter-spacing: 4rpx; }
+
+.profile-row { display: flex; align-items: center; }
+.avatar-btn { padding: 0; margin: 0; background: transparent; line-height: 1; width: 120rpx; }
+.avatar-btn::after { border: none; }
+.avatar {
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: #f0eeea;
+}
+.avatar-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b5aea3;
+  font-size: 40rpx;
+}
+.nick-input { flex: 1; font-size: 32rpx; margin-left: 28rpx; padding: 16rpx 0; border-bottom: 1rpx solid #f2efe9; }
+
+.invite-card { border: 1rpx solid #f0dcb4; background: #fffdf6; }
+.invite-name { font-size: 30rpx; margin-bottom: 8rpx; }

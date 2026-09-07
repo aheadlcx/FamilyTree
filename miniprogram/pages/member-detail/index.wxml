@@ -1,0 +1,83 @@
+<view wx:if="{{error}}" class="empty">
+  <view class="empty-icon">🔒</view>
+  <view>{{error}}</view>
+  <view class="muted" style="margin-top: 12rpx;">加入该家族后即可查看</view>
+</view>
+
+<block wx:if="{{ready && m}}">
+  <!-- 头部 -->
+  <view class="card md-head">
+    <image wx:if="{{m.photoFileId}}" class="md-photo" src="{{m.photoFileId}}" mode="aspectFill" bindtap="previewPhoto" />
+    <view wx:else class="md-photo md-ph g{{m.gender}}">{{m.initial}}</view>
+    <view class="md-head-info">
+      <view class="md-name">
+        {{m.name}}
+        <text wx:if="{{isSelf}}" class="tag tag-green">本人</text>
+        <text wx:if="{{m.isAlive === false}}" class="tag tag-gray">已故</text>
+      </view>
+      <view class="muted md-line">{{m.years || '生卒不详'}}</view>
+      <view class="md-tags">
+        <text class="tag tag-blue">{{m.genderName}}</text>
+        <text class="tag tag-gold">第{{m.generation + 1}}世</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 详细资料 -->
+  <view class="card">
+    <view class="h2">详细资料</view>
+    <view class="md-row" wx:if="{{m.birthDate}}"><view class="md-label">出生</view><view>{{m.birthDate}}</view></view>
+    <view class="md-row" wx:if="{{m.deathDate}}"><view class="md-label">逝世</view><view>{{m.deathDate}}</view></view>
+    <view class="md-row" wx:if="{{m.birthPlace}}"><view class="md-label">籍贯</view><view>{{m.birthPlace}}</view></view>
+    <view class="md-row" wx:if="{{m.occupation}}"><view class="md-label">职业</view><view>{{m.occupation}}</view></view>
+    <view class="md-row" wx:if="{{m.phone}}"><view class="md-label">电话</view><view>{{m.phone}}</view></view>
+    <view class="md-row" wx:if="{{m.bio}}"><view class="md-label">生平</view><view class="md-bio">{{m.bio}}</view></view>
+    <view wx:if="{{!m.birthDate && !m.deathDate && !m.birthPlace && !m.occupation && !m.phone && !m.bio}}" class="muted">
+      还没有补充资料
+    </view>
+  </view>
+
+  <!-- 关系 -->
+  <view class="card">
+    <view class="h2">家族关系</view>
+    <view class="md-rel" wx:if="{{father || mother}}">
+      <view class="md-rel-label">父母</view>
+      <view class="md-chips">
+        <view wx:if="{{father}}" class="md-chip" bindtap="goMember" data-id="{{father._id}}">{{father.name}}</view>
+        <view wx:if="{{mother}}" class="md-chip" bindtap="goMember" data-id="{{mother._id}}">{{mother.name}}</view>
+      </view>
+    </view>
+    <view class="md-rel" wx:if="{{spouses.length}}">
+      <view class="md-rel-label">配偶</view>
+      <view class="md-chips">
+        <view wx:for="{{spouses}}" wx:key="_id" class="md-chip" bindtap="goMember" data-id="{{item._id}}">{{item.name}}</view>
+      </view>
+    </view>
+    <view class="md-rel" wx:if="{{children.length}}">
+      <view class="md-rel-label">子女</view>
+      <view class="md-chips">
+        <view wx:for="{{children}}" wx:key="_id" class="md-chip" bindtap="goMember" data-id="{{item._id}}">{{item.name}}</view>
+      </view>
+    </view>
+    <view class="md-rel" wx:if="{{siblings.length}}">
+      <view class="md-rel-label">同胞</view>
+      <view class="md-chips">
+        <view wx:for="{{siblings}}" wx:key="_id" class="md-chip" bindtap="goMember" data-id="{{item._id}}">{{item.name}}</view>
+      </view>
+    </view>
+    <view wx:if="{{!father && !mother && !spouses.length && !children.length && !siblings.length}}" class="muted">
+      暂无关联成员，可在「编辑」中添加父母 / 配偶
+    </view>
+  </view>
+
+  <!-- 操作 -->
+  <view class="card safe-bottom">
+    <button class="btn btn-plain" bindtap="viewBranch">🌳 在族谱中查看支系</button>
+    <button wx:if="{{!isSelf && familyId}}" class="btn btn-plain" bindtap="setSelf">👤 设为本人</button>
+    <block wx:if="{{canEdit}}">
+      <button class="btn btn-primary" bindtap="goEdit">编辑资料</button>
+      <button class="btn btn-plain" bindtap="addChild">添加子女</button>
+    </block>
+    <button wx:if="{{canManage}}" class="btn btn-warn" bindtap="remove">删除该成员</button>
+  </view>
+</block>

@@ -1,0 +1,144 @@
+page {
+  background: #f6f4ee;
+  color: #33302b;
+  font-size: 28rpx;
+  line-height: 1.5;
+}
+
+/* ---------- 卡片 ---------- */
+.card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx;
+  margin: 20rpx 24rpx;
+  box-shadow: 0 2rpx 10rpx rgba(80, 60, 20, 0.05);
+}
+.h1 { font-size: 40rpx; font-weight: 700; }
+.h2 { font-size: 32rpx; font-weight: 600; margin-bottom: 16rpx; }
+.muted { color: #9a938a; font-size: 24rpx; }
+.gold { color: #a4762a; }
+
+/* ---------- 标签 ---------- */
+.tag {
+  display: inline-block;
+  padding: 2rpx 16rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  margin-right: 8rpx;
+  vertical-align: middle;
+}
+.tag-green { background: #e6f7ee; color: #07c160; }
+.tag-gold  { background: #f7efdd; color: #a4762a; }
+.tag-gray  { background: #f0eeea; color: #8a857d; }
+.tag-blue  { background: #e8f1ff; color: #3d7eff; }
+.tag-red   { background: #ffecec; color: #e64340; }
+
+/* ---------- 按钮 ---------- */
+.btn {
+  border-radius: 14rpx;
+  font-size: 30rpx;
+  padding: 14rpx 0;
+  margin-top: 18rpx;
+  text-align: center;
+  line-height: 1.4;
+}
+.btn::after { border: none; }
+.btn-primary { background: #07c160; color: #fff; }
+.btn-primary[disabled] { background: #a5dec2; color: #fff; }
+.btn-plain { background: #fff; color: #07c160; border: 1rpx solid #07c160; }
+.btn-plain[disabled] { color: #a5dec2; border-color: #a5dec2; }
+.btn-warn { background: #ffecec; color: #e64340; }
+.btn-mini {
+  display: inline-block;
+  font-size: 24rpx;
+  padding: 6rpx 24rpx;
+  margin: 0 0 0 12rpx;
+  border-radius: 999rpx;
+  line-height: 1.6;
+}
+
+/* ---------- 列表 ---------- */
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f2efe9;
+}
+.cell:last-child { border-bottom: none; }
+.cell-title { font-size: 30rpx; }
+.cell-right { color: #b5aea3; font-size: 26rpx; display: flex; align-items: center; }
+.arrow { color: #c9c2b8; margin-left: 8rpx; font-size: 30rpx; }
+
+/* ---------- 表单 ---------- */
+.form-item {
+  display: flex;
+  align-items: center;
+  min-height: 92rpx;
+  border-bottom: 1rpx solid #f2efe9;
+}
+.form-item:last-child { border-bottom: none; }
+.form-label { width: 180rpx; color: #6b655c; font-size: 28rpx; flex-shrink: 0; }
+.form-input { flex: 1; font-size: 28rpx; }
+.form-picker { flex: 1; font-size: 28rpx; color: #33302b; }
+.form-picker.placeholder { color: #b5aea3; }
+.form-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  font-size: 28rpx;
+  padding: 20rpx 0;
+}
+.form-tip { color: #b5aea3; font-size: 22rpx; margin-top: 12rpx; }
+
+/* ---------- 空态 ---------- */
+.empty { text-align: center; color: #b5aea3; padding: 120rpx 40rpx; }
+.empty-icon { font-size: 88rpx; margin-bottom: 16rpx; }
+
+/* ---------- 浮动按钮 ---------- */
+.fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: calc(60rpx + env(safe-area-inset-bottom));
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 50%;
+  background: #07c160;
+  color: #fff;
+  font-size: 56rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(7, 193, 96, 0.35);
+  z-index: 5;
+}
+
+/* ---------- 筛选 chips ---------- */
+.chipbar { display: flex; flex-wrap: wrap; padding: 0 24rpx; margin-top: 16rpx; }
+.chip {
+  padding: 8rpx 26rpx;
+  border-radius: 999rpx;
+  background: #fff;
+  color: #6b655c;
+  font-size: 26rpx;
+  margin: 0 16rpx 16rpx 0;
+  border: 1rpx solid #ece8e0;
+}
+.chip.active { background: #07c160; color: #fff; border-color: #07c160; }
+
+/* ---------- 其他 ---------- */
+.safe-bottom { padding-bottom: calc(50rpx + env(safe-area-inset-bottom)); }
+.divider { height: 1rpx; background: #f2efe9; margin: 20rpx 0; }
+.section-gap { height: 20rpx; }
+.badge-dot {
+  display: inline-block;
+  min-width: 30rpx;
+  height: 30rpx;
+  line-height: 30rpx;
+  border-radius: 999rpx;
+  background: #fa5151;
+  color: #fff;
+  font-size: 20rpx;
+  text-align: center;
+  padding: 0 6rpx;
+  margin-left: 8rpx;
+}

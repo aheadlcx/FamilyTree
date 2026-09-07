@@ -1,0 +1,46 @@
+<!-- 未加入家族 -->
+<view wx:if="{{ready && noFamily}}" class="empty">
+  <view class="empty-icon">🌳</view>
+  <view>你还未加入任何家族</view>
+  <view class="muted" style="margin: 12rpx 0 30rpx;">创建家族，或用邀请码加入家人的家族</view>
+  <button class="btn btn-primary" style="margin: 0 80rpx;" bindtap="goWelcome">创建 / 加入家族</button>
+</view>
+
+<!-- 族谱树 -->
+<block wx:if="{{ready && !noFamily && ctx}}">
+  <view class="toolbar">
+    <view class="toolbar-left" bindtap="goStats">
+      <view class="toolbar-family">{{ctx.family.name}}</view>
+      <view class="toolbar-sub">
+        <text class="tag tag-gold">{{ctx.role === 'owner' ? '族主' : (ctx.role === 'admin' ? '管理员' : (ctx.role === 'editor' ? '编辑员' : '浏览'))}}</text>
+        <text class="muted">{{total}} 位族人 · {{ctx.family.surname || ''}}</text>
+      </view>
+    </view>
+    <view class="toolbar-right">
+      <view wx:if="{{selfId}}" class="tool-btn" bindtap="viewSelf">📍我</view>
+      <view wx:if="{{canManage}}" class="tool-btn" bindtap="goAdmin">
+        管理<text wx:if="{{ctx.pendingCount}}" class="badge-dot">{{ctx.pendingCount}}</text>
+      </view>
+      <button class="tool-btn tool-share" open-type="share">邀请</button>
+    </view>
+  </view>
+
+  <view wx:if="{{!roots.length}}" class="empty">
+    <view class="empty-icon">🌱</view>
+    <view>族谱还是空的</view>
+    <view class="muted" style="margin-top: 12rpx;">去「成员」页添加第一位族人吧</view>
+  </view>
+
+  <scroll-view wx:else class="tree-scroll" scroll-x scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="tree-canvas">
+      <view wx:for="{{roots}}" wx:key="_id" class="tree-root">
+        <tree-node
+          node="{{item}}"
+          self-id="{{selfId}}"
+          bind:select="onNodeSelect"
+          bind:action="onNodeAction"
+        />
+      </view>
+    </view>
+  </scroll-view>
+</block>

@@ -1,0 +1,44 @@
+.pf-user { display: flex; align-items: center; }
+.pf-avatar-btn {
+  position: relative;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  width: 132rpx;
+  line-height: 1;
+}
+.pf-avatar-btn::after { border: none; }
+.pf-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  background: #f0eeea;
+}
+.pf-avatar-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b5aea3;
+  font-size: 44rpx;
+}
+.pf-avatar-edit {
+  position: absolute;
+  right: -2rpx;
+  bottom: -2rpx;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #07c160;
+  color: #fff;
+  font-size: 20rpx;
+}
+.pf-user-info { flex: 1; margin-left: 28rpx; }
+.pf-name { font-size: 38rpx; font-weight: 700; }
+.pf-edit { color: #b5aea3; font-size: 26rpx; margin-left: 12rpx; }
+
+.pf-help { font-size: 26rpx; color: #6b655c; line-height: 1.7; }
+.pf-help-item { margin-bottom: 16rpx; }
+.pf-help-item:last-child { margin-bottom: 0; }
+.pf-help-k { color: #a4762a; font-weight: 600; }

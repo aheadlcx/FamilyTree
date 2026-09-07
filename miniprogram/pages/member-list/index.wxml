@@ -1,0 +1,45 @@
+<view wx:if="{{ready && noFamily}}" class="empty">
+  <view class="empty-icon">🌳</view>
+  <view>你还未加入任何家族</view>
+  <button class="btn btn-primary" style="margin: 30rpx 80rpx 0;" bindtap="goWelcome">创建 / 加入家族</button>
+</view>
+
+<block wx:if="{{ready && !noFamily}}">
+  <view class="search-bar">
+    <input class="search-input" placeholder="搜索姓名 / 职业 / 籍贯" value="{{keyword}}" bindinput="onSearch" confirm-type="search" />
+    <view class="search-stat" bindtap="goStats">统计</view>
+  </view>
+
+  <view class="chipbar">
+    <view class="chip {{filter === 'all' ? 'active' : ''}}" bindtap="setFilter" data-f="all">全部</view>
+    <view class="chip {{filter === 'alive' ? 'active' : ''}}" bindtap="setFilter" data-f="alive">在世</view>
+    <view class="chip {{filter === 'dead' ? 'active' : ''}}" bindtap="setFilter" data-f="dead">已故</view>
+    <view class="chip {{filter === 'male' ? 'active' : ''}}" bindtap="setFilter" data-f="male">男</view>
+    <view class="chip {{filter === 'female' ? 'active' : ''}}" bindtap="setFilter" data-f="female">女</view>
+    <view class="muted" style="margin-left:auto; line-height:56rpx;">共 {{list.length}} 人</view>
+  </view>
+
+  <view wx:if="{{!list.length}}" class="empty">
+    <view class="empty-icon">🍃</view>
+    <view>{{total ? '没有符合条件的人' : '还没有族人，点击右下角 + 添加'}}</view>
+  </view>
+
+  <view wx:else class="card" style="padding: 8rpx 28rpx;">
+    <view wx:for="{{list}}" wx:key="_id" class="cell" bindtap="goDetail" data-id="{{item._id}}">
+      <image wx:if="{{item.photoFileId}}" class="ml-avatar" src="{{item.photoFileId}}" mode="aspectFill" lazy-load="{{true}}" />
+      <view wx:else class="ml-avatar ml-ph g{{item.gender}}">{{item.initial}}</view>
+      <view class="ml-info">
+        <view class="ml-name">
+          {{item.name}}
+          <text wx:if="{{item._id === selfId}}" class="tag tag-green">我</text>
+          <text wx:if="{{item.isAlive === false}}" class="tag tag-gray">故</text>
+        </view>
+        <view class="muted">{{item.genderName}} · 第{{item.generation + 1}}世 · {{item.years || '生卒不详'}}</view>
+      </view>
+      <view class="arrow">›</view>
+    </view>
+  </view>
+
+  <view wx:if="{{canEdit}}" class="fab" bindtap="goEdit">＋</view>
+  <view class="safe-bottom"></view>
+</block>

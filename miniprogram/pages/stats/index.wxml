@@ -1,0 +1,89 @@
+<view wx:if="{{ready && !s}}" class="empty">
+  <view class="empty-icon">📊</view>
+  <view>加入家族后可查看统计</view>
+</view>
+
+<block wx:if="{{s}}">
+  <view class="card">
+    <view class="h2">{{s.familyName}} · 总览</view>
+    <view class="st-grid">
+      <view class="st-cell">
+        <view class="st-num">{{s.total}}</view>
+        <view class="st-label">族人总数</view>
+      </view>
+      <view class="st-cell">
+        <view class="st-num">{{s.generations}}</view>
+        <view class="st-label">传承世代</view>
+      </view>
+      <view class="st-cell">
+        <view class="st-num">{{s.alive}}</view>
+        <view class="st-label">在世</view>
+      </view>
+      <view class="st-cell">
+        <view class="st-num">{{s.deceased}}</view>
+        <view class="st-label">已故</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="h2">性别构成</view>
+    <view class="st-grid st-grid-3">
+      <view class="st-cell">
+        <view class="st-num" style="color:#3d7eff;">{{s.male}}</view>
+        <view class="st-label">男</view>
+      </view>
+      <view class="st-cell">
+        <view class="st-num" style="color:#ff7aa0;">{{s.female}}</view>
+        <view class="st-label">女</view>
+      </view>
+      <view class="st-cell">
+        <view class="st-num">{{s.unknown}}</view>
+        <view class="st-label">未知</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{s.avgLifespan !== null || s.oldest}}">
+    <view class="h2">寿命</view>
+    <view class="st-line" wx:if="{{s.avgLifespan !== null}}">
+      <text>已故族人平均寿命</text>
+      <text class="st-strong">{{s.avgLifespan}} 岁</text>
+    </view>
+    <view class="st-line" wx:if="{{s.oldest}}">
+      <text>最长寿</text>
+      <text class="st-strong">{{s.oldest.name}}（{{s.oldest.age}} 岁）</text>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{genDist.length}}">
+    <view class="h2">世代分布</view>
+    <view wx:for="{{genDist}}" wx:key="label" class="st-bar-row">
+      <view class="st-bar-label">{{item.label}}</view>
+      <view class="st-bar-track">
+        <view class="st-bar-fill" style="width: {{item.pct}}%;"></view>
+      </view>
+      <view class="st-bar-num">{{item.count}}</view>
+    </view>
+  </view>
+
+  <view class="card" wx:if="{{decadeDist.length}}">
+    <view class="h2">出生年代分布</view>
+    <view wx:for="{{decadeDist}}" wx:key="decade" class="st-bar-row">
+      <view class="st-bar-label">{{item.decade}}</view>
+      <view class="st-bar-track">
+        <view class="st-bar-fill st-bar-gold" style="width: {{item.pct}}%;"></view>
+      </view>
+      <view class="st-bar-num">{{item.count}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="st-line">
+      <text>今年新增族人</text>
+      <text class="st-strong">{{s.addedThisYear}} 位</text>
+    </view>
+  </view>
+
+  <view class="safe-bottom"></view>
+</block>

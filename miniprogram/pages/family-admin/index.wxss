@@ -1,0 +1,60 @@
+.fa-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+.fa-avatar-ph {
+  background: #ece8e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9a938a;
+  font-size: 34rpx;
+}
+.fa-mid { flex: 1; min-width: 0; }
+.fa-ops { display: flex; align-items: center; flex-shrink: 0; }
+.fa-ops .btn-mini { margin-left: 12rpx; margin-top: 0; }
+
+.fa-invite { display: flex; align-items: center; }
+.fa-code {
+  font-size: 48rpx;
+  font-weight: 700;
+  letter-spacing: 10rpx;
+  color: #a4762a;
+  background: #f7efdd;
+  border-radius: 14rpx;
+  padding: 14rpx 30rpx;
+}
+.fa-invite-ops { margin-left: 24rpx; display: flex; flex-direction: column; }
+.fa-invite-ops .btn-mini { margin: 8rpx 0 0; }
+.fa-invite-ops .btn-mini:first-child { margin-top: 0; }
+
+.fa-log {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f2efe9;
+  font-size: 26rpx;
+}
+.fa-log:last-child { border-bottom: none; }
+.fa-log-op { font-weight: 600; margin-right: 8rpx; }
+.fa-log-act { color: #6b655c; }
+
+.fa-mask {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+.fa-sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: 28rpx 28rpx calc(30rpx + env(safe-area-inset-bottom));
+}
+.fa-sheet-list { max-height: 55vh; }

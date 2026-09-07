@@ -1,0 +1,45 @@
+<view class="tn" wx:if="{{node}}">
+  <view class="tn-couple">
+    <view
+      class="tn-card {{selfId === node._id ? 'tn-self' : ''}}"
+      bindtap="onTap"
+      bindlongpress="onLongPress"
+      data-id="{{node._id}}"
+    >
+      <image wx:if="{{node.photoFileId}}" class="tn-photo" src="{{node.photoFileId}}" mode="aspectFill" lazy-load="{{true}}" />
+      <view wx:else class="tn-photo tn-ph g{{node.gender}}">{{node.initial}}</view>
+      <view class="tn-name">{{node.name}}<text wx:if="{{node.isAlive === false}}" class="tn-cross">†</text></view>
+      <view class="tn-years">{{node.years}}</view>
+      <view class="tn-gen">第{{node.generation + 1}}世</view>
+    </view>
+
+    <block wx:if="{{node.spouses.length}}">
+      <view class="tn-link">♥</view>
+      <view
+        wx:for="{{node.spouses}}"
+        wx:key="_id"
+        class="tn-card tn-spouse"
+        bindtap="onTap"
+        bindlongpress="onLongPress"
+        data-id="{{item._id}}"
+      >
+        <image wx:if="{{item.photoFileId}}" class="tn-photo" src="{{item.photoFileId}}" mode="aspectFill" lazy-load="{{true}}" />
+        <view wx:else class="tn-photo tn-ph g{{item.gender}}">{{item.initial}}</view>
+        <view class="tn-name">{{item.name}}<text wx:if="{{item.isAlive === false}}" class="tn-cross">†</text></view>
+        <view class="tn-years">{{item.years}}</view>
+        <view class="tn-gen">配偶</view>
+      </view>
+    </block>
+  </view>
+
+  <view wx:if="{{node.children.length}}" class="tn-children">
+    <view class="tn-child" wx:for="{{node.children}}" wx:key="_id">
+      <tree-node
+        node="{{item}}"
+        self-id="{{selfId}}"
+        bind:select="onChildSelect"
+        bind:action="onChildAction"
+      />
+    </view>
+  </view>
+</view>

@@ -1,0 +1,38 @@
+<view wx:if="{{show}}" class="mp-mask" bindtap="close" catch:touchmove="noop">
+  <view class="mp-panel" catchtap="noop">
+    <view class="mp-header">
+      <view class="mp-title">{{title}}</view>
+      <view class="mp-close" bindtap="close">✕</view>
+    </view>
+    <view class="mp-search">
+      <input class="mp-search-input" placeholder="搜索姓名 / 职业 / 籍贯" value="{{keyword}}" bindinput="onSearch" />
+    </view>
+    <scroll-view class="mp-list" scroll-y>
+      <view wx:if="{{loading}}" class="mp-empty">加载中…</view>
+      <view wx:elif="{{!list.length}}" class="mp-empty">没有找到成员</view>
+      <block wx:else>
+        <view
+          wx:for="{{list}}"
+          wx:key="_id"
+          class="mp-item {{item._sel ? 'mp-item-active' : ''}} {{item._dis ? 'mp-item-disabled' : ''}}"
+          data-id="{{item._id}}"
+          bindtap="onPick"
+        >
+          <image wx:if="{{item.photoFileId}}" class="mp-avatar" src="{{item.photoFileId}}" mode="aspectFill" />
+          <view wx:else class="mp-avatar mp-avatar-ph g{{item.gender}}">{{item.initial}}</view>
+          <view class="mp-info">
+            <view class="mp-name">{{item.name}} <text class="muted">{{item.years}}</text></view>
+            <view class="muted">{{item.genderName}} · 第{{item.generation + 1}}世</view>
+          </view>
+          <view wx:if="{{item._sel}}" class="mp-check">✓</view>
+        </view>
+        <view class="mp-bottom-space"></view>
+      </block>
+    </scroll-view>
+    <view wx:if="{{multi}}" class="mp-footer">
+      <button class="btn btn-primary" disabled="{{!selectedCount}}" bindtap="onConfirm">
+        确定（已选 {{selectedCount}} 人）
+      </button>
+    </view>
+  </view>
+</view>

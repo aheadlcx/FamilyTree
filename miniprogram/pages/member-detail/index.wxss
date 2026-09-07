@@ -1,0 +1,39 @@
+.md-head { display: flex; align-items: center; }
+.md-photo {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 24rpx;
+  flex-shrink: 0;
+}
+.md-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 64rpx;
+  font-weight: 600;
+}
+.md-ph.g1 { background: #6da2ff; }
+.md-ph.g2 { background: #ff9db6; }
+.md-ph.g0 { background: #c9c2b8; }
+.md-head-info { flex: 1; margin-left: 28rpx; min-width: 0; }
+.md-name { font-size: 40rpx; font-weight: 700; }
+.md-line { margin: 8rpx 0; }
+.md-tags { margin-top: 4rpx; }
+
+.md-row { display: flex; padding: 14rpx 0; font-size: 29rpx; }
+.md-label { width: 130rpx; color: #9a938a; flex-shrink: 0; }
+.md-bio { flex: 1; word-break: break-all; }
+
+.md-rel { margin-bottom: 20rpx; }
+.md-rel:last-child { margin-bottom: 0; }
+.md-rel-label { color: #9a938a; font-size: 24rpx; margin-bottom: 10rpx; }
+.md-chips { display: flex; flex-wrap: wrap; }
+.md-chip {
+  background: #f6f4ee;
+  border: 1rpx solid #ece8e0;
+  border-radius: 999rpx;
+  padding: 8rpx 28rpx;
+  font-size: 27rpx;
+  margin: 0 14rpx 14rpx 0;
+}

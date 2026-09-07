@@ -1,0 +1,117 @@
+<view class="card">
+  <view class="h2">基本资料</view>
+
+  <view class="form-item">
+    <view class="form-label">姓名</view>
+    <input class="form-input" placeholder="必填" value="{{form.name}}" bindinput="onInput" data-k="name" />
+  </view>
+
+  <view class="form-item">
+    <view class="form-label">性别</view>
+    <picker mode="selector" range="{{genderRange}}" value="{{form.gender}}" bindchange="onGender">
+      <view class="form-picker">{{genderRange[form.gender]}}</view>
+    </picker>
+  </view>
+
+  <view class="form-item">
+    <view class="form-label">照片</view>
+    <view class="me-photo-row">
+      <view wx:if="{{form.photoTemp || form.photoFileId}}" class="me-photo-wrap">
+        <image class="me-photo" src="{{form.photoTemp || form.photoFileId}}" mode="aspectFill" bindtap="previewPhoto" />
+        <view class="me-photo-del" catchtap="removePhoto">✕</view>
+      </view>
+      <view wx:else class="me-photo-add" bindtap="choosePhoto">＋</view>
+      <view class="form-tip" style="margin:0 0 0 20rpx;">点击上传，自动存入云存储</view>
+    </view>
+  </view>
+
+  <view class="form-item">
+    <view class="form-label">出生日期</view>
+    <picker mode="date" value="{{form.birthDate}}" start="1800-01-01" end="2100-12-31" bindchange="onBirth">
+      <view class="form-picker {{!form.birthDate ? 'placeholder' : ''}}">{{form.birthDate || '选择日期'}}</view>
+    </picker>
+    <view wx:if="{{form.birthDate}}" class="me-clear" bindtap="clearDate" data-k="birthDate">清除</view>
+  </view>
+
+  <view class="form-item">
+    <view class="form-label">在世</view>
+    <switch checked="{{form.isAlive}}" bindchange="onAlive" color="#07c160" />
+  </view>
+
+  <view class="form-item" wx:if="{{!form.isAlive}}">
+    <view class="form-label">逝世日期</view>
+    <picker mode="date" value="{{form.deathDate}}" start="1800-01-01" end="2100-12-31" bindchange="onDeath">
+      <view class="form-picker {{!form.deathDate ? 'placeholder' : ''}}">{{form.deathDate || '选择日期'}}</view>
+    </picker>
+    <view wx:if="{{form.deathDate}}" class="me-clear" bindtap="clearDate" data-k="deathDate">清除</view>
+  </view>
+
+  <view class="form-item">
+    <view class="form-label">籍贯</view>
+    <input class="form-input" placeholder="如：广东广州（选填）" value="{{form.birthPlace}}" bindinput="onInput" data-k="birthPlace" />
+  </view>
+  <view class="form-item">
+    <view class="form-label">职业</view>
+    <input class="form-input" placeholder="选填" value="{{form.occupation}}" bindinput="onInput" data-k="occupation" />
+  </view>
+  <view class="form-item">
+    <view class="form-label">电话</view>
+    <input class="form-input" type="number" placeholder="仅家族成员可见" value="{{form.phone}}" bindinput="onInput" data-k="phone" />
+  </view>
+</view>
+
+<view class="card">
+  <view class="form-textarea-wrap">
+    <view class="h2">生平简介</view>
+    <textarea class="form-textarea" placeholder="事迹、生平、备注…" maxlength="2000" value="{{form.bio}}" bindinput="onInput" data-k="bio" />
+  </view>
+</view>
+
+<view class="card">
+  <view class="h2">家族关系</view>
+
+  <view class="form-item">
+    <view class="form-label">父亲</view>
+    <view wx:if="{{father}}" class="me-rel">
+      <text>{{father.name}}</text>
+      <text class="me-clear" bindtap="clearFather">移除</text>
+    </view>
+    <view wx:else class="form-picker placeholder" bindtap="pickFather">点击选择</view>
+  </view>
+
+  <view class="form-item">
+    <view class="form-label">母亲</view>
+    <view wx:if="{{mother}}" class="me-rel">
+      <text>{{mother.name}}</text>
+      <text class="me-clear" bindtap="clearMother">移除</text>
+    </view>
+    <view wx:else class="form-picker placeholder" bindtap="pickMother">点击选择</view>
+  </view>
+
+  <view class="form-item" style="align-items: flex-start;">
+    <view class="form-label" style="padding-top: 24rpx;">配偶</view>
+    <view class="me-spouses">
+      <view wx:for="{{spouses}}" wx:key="_id" class="me-spouse-chip">
+        {{item.name}}
+        <text class="me-spouse-x" bindtap="removeSpouse" data-id="{{item._id}}">✕</text>
+      </view>
+      <view class="me-spouse-add" bindtap="pickSpouse">＋ 添加配偶</view>
+    </view>
+  </view>
+  <view class="form-tip">父母与配偶必须已是本家族成员；世代数会按父母自动计算</view>
+</view>
+
+<view class="safe-bottom">
+  <button class="btn btn-primary" style="margin: 10rpx 24rpx;" disabled="{{saving}}" bindtap="onSave">
+    {{saving ? '保存中…' : (isEdit ? '保存修改' : '添加成员')}}
+  </button>
+</view>
+
+<member-picker
+  show="{{pickerShow}}"
+  title="{{pickerTitle}}"
+  multi="{{pickerMulti}}"
+  exclude="{{pickerExclude}}"
+  bind:pick="onPicked"
+  bind:close="onPickerClose"
+/>

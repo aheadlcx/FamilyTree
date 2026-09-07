@@ -1,0 +1,134 @@
+<view wx:if="{{ready && denied}}" class="empty">
+  <view class="empty-icon">🔒</view>
+  <view>需要管理员及以上权限</view>
+</view>
+
+<block wx:if="{{ready && !denied && family}}">
+  <!-- 待审批 -->
+  <view class="card">
+    <view class="h2">加入申请 <text wx:if="{{pending.length}}" class="badge-dot">{{pending.length}}</text></view>
+    <view wx:if="{{!pending.length}}" class="muted">暂无待审批申请</view>
+    <view wx:for="{{pending}}" wx:key="_id" class="cell">
+      <image wx:if="{{item.avatarUrl}}" class="fa-avatar" src="{{item.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="fa-avatar fa-avatar-ph">{{item.initial}}</view>
+      <view class="fa-mid">
+        <view class="cell-title">{{item.nickname}}</view>
+        <view class="muted">{{item.message || item.timeLabel}}</view>
+      </view>
+      <view class="fa-ops">
+        <button class="btn-mini btn-primary" bindtap="approve" data-id="{{item._id}}">通过</button>
+        <button class="btn-mini btn-warn" bindtap="reject" data-id="{{item._id}}">拒绝</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 邀请 -->
+  <view class="card">
+    <view class="h2">邀请加入</view>
+    <view class="fa-invite">
+      <view class="fa-code" bindtap="copyCode">{{inviteCode}}</view>
+      <view class="fa-invite-ops">
+        <button class="btn-mini btn-plain" open-type="share">分享邀请</button>
+        <button class="btn-mini btn-plain" bindtap="regenCode">更换</button>
+      </view>
+    </view>
+    <view class="form-tip">点邀请码可复制。新成员也可以通过输入邀请码申请加入。</view>
+    <view class="divider"></view>
+    <view class="form-item">
+      <view class="form-label">自动通过</view>
+      <switch checked="{{autoApprove}}" bindchange="onAutoApprove" color="#07c160" />
+    </view>
+    <view class="form-item">
+      <view class="form-label">新成员角色</view>
+      <picker mode="selector" range="{{roleOptions}}" value="{{defaultRoleIdx}}" bindchange="onDefaultRole">
+        <view class="form-picker">{{roleOptions[defaultRoleIdx]}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- 成员权限 -->
+  <view class="card">
+    <view class="h2">成员与权限（{{users.length}}）</view>
+    <view wx:for="{{users}}" wx:key="openid" class="cell">
+      <image wx:if="{{item.avatarUrl}}" class="fa-avatar" src="{{item.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="fa-avatar fa-avatar-ph">{{item.initial}}</view>
+      <view class="fa-mid">
+        <view class="cell-title">
+          <text wx:if="{{item.role === 'owner'}}">👑 </text>{{item.nickname}}
+        </view>
+        <view class="muted">{{item.roleName}} · {{item.joinedLabel}}加入</view>
+      </view>
+      <view wx:if="{{!item.locked}}" class="fa-ops">
+        <picker mode="selector" range="{{roleOptions}}" value="{{item.roleIdx}}" data-oid="{{item.openid}}" bindchange="onRoleChange">
+          <button class="btn-mini btn-plain">改角色</button>
+        </picker>
+        <button class="btn-mini btn-warn" bindtap="removeUser" data-oid="{{item.openid}}">移出</button>
+      </view>
+      <view wx:else class="muted">不可操作</view>
+    </view>
+    <view class="form-tip">管理员可管理浏览/编辑员；修改管理员或移出管理员需要族主操作。</view>
+  </view>
+
+  <!-- 家族设置 -->
+  <view class="card">
+    <view class="h2">家族设置</view>
+    <view class="form-item">
+      <view class="form-label">家族名称</view>
+      <input class="form-input" value="{{setForm.name}}" bindinput="onSetInput" data-k="name" />
+    </view>
+    <view class="form-item">
+      <view class="form-label">姓氏</view>
+      <input class="form-input" value="{{setForm.surname}}" bindinput="onSetInput" data-k="surname" />
+    </view>
+    <view class="form-item">
+      <view class="form-label">简介</view>
+      <input class="form-input" value="{{setForm.description}}" bindinput="onSetInput" data-k="description" />
+    </view>
+    <button class="btn btn-primary" bindtap="saveSettings">保存设置</button>
+  </view>
+
+  <!-- 操作日志 -->
+  <view class="card">
+    <view class="h2">操作日志</view>
+    <view wx:if="{{!logs.length}}" class="muted">暂无日志</view>
+    <view wx:for="{{logs}}" wx:key="_id" class="fa-log">
+      <view>
+        <text class="fa-log-op">{{item.operator}}</text>
+        <text class="fa-log-act">{{item.action}}</text>
+        <text wx:if="{{item.detail}}" class="muted"> · {{item.detail}}</text>
+      </view>
+      <view class="muted">{{item.timeLabel}}</view>
+    </view>
+  </view>
+
+  <!-- 危险区 -->
+  <view class="card">
+    <view class="h2" style="color:#e64340;">更多操作</view>
+    <button class="btn btn-plain" bindtap="exportData">📦 导出族谱数据（JSON 备份）</button>
+    <button wx:if="{{!isOwner}}" class="btn btn-plain" bindtap="leaveFamily">退出家族</button>
+    <block wx:if="{{isOwner}}">
+      <button class="btn btn-plain" bindtap="openTransfer">👑 转让族主</button>
+      <button class="btn btn-warn" bindtap="dissolveFamily">解散家族（删除全部数据）</button>
+    </block>
+  </view>
+
+  <view class="safe-bottom"></view>
+
+  <!-- 转让弹层 -->
+  <view wx:if="{{showTransfer}}" class="fa-mask" bindtap="closeTransfer">
+    <view class="fa-sheet" catchtap="noop">
+      <view class="h2" style="padding: 10rpx 0 20rpx;">选择新族主</view>
+      <scroll-view scroll-y class="fa-sheet-list">
+        <view wx:for="{{transferCandidates}}" wx:key="openid" class="cell" bindtap="pickTransfer" data-oid="{{item.openid}}">
+          <image wx:if="{{item.avatarUrl}}" class="fa-avatar" src="{{item.avatarUrl}}" mode="aspectFill" />
+          <view wx:else class="fa-avatar fa-avatar-ph">{{item.initial}}</view>
+          <view class="fa-mid">
+            <view class="cell-title">{{item.nickname}}</view>
+            <view class="muted">{{item.roleName}}</view>
+          </view>
+          <view class="arrow">›</view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</block>

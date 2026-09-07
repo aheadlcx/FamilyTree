@@ -1,0 +1,47 @@
+<view wx:if="{{ready && noFamily}}" class="empty">
+  <view class="empty-icon">🌳</view>
+  <view>你还未加入任何家族</view>
+  <button class="btn btn-primary" style="margin: 30rpx 80rpx 0;" bindtap="goWelcome">创建 / 加入家族</button>
+</view>
+
+<block wx:if="{{ready && !noFamily}}">
+  <view wx:if="{{!events.length}}" class="empty">
+    <view class="empty-icon">📜</view>
+    <view>还没有大事记</view>
+    <view class="muted" style="margin-top: 12rpx;">婚丧嫁娶、寿诞、团圆、乔迁…都值得记录</view>
+  </view>
+
+  <view wx:else class="tl-wrap">
+    <view wx:for="{{events}}" wx:key="_id" class="card tl-item">
+      <view class="tl-dot-line"></view>
+      <view class="tl-date">{{item.date}}</view>
+      <view class="tl-title">{{item.title}}</view>
+      <view wx:if="{{item.description}}" class="tl-desc">{{item.description}}</view>
+      <view wx:if="{{item.images.length}}" class="tl-images">
+        <image
+          wx:for="{{item.images}}"
+          wx:for-item="img"
+          wx:for-index="imgIdx"
+          wx:key="*this"
+          class="tl-img"
+          src="{{img}}"
+          mode="aspectFill"
+          lazy-load="{{true}}"
+          bindtap="previewImages"
+          data-images="{{item.images}}"
+          data-current="{{img}}"
+        />
+      </view>
+      <view class="tl-foot">
+        <text class="muted">{{item.creator || '家族成员'}}记录</text>
+        <view wx:if="{{canEdit}}" class="tl-actions">
+          <text class="tl-act" bindtap="goEdit" data-id="{{item._id}}">编辑</text>
+          <text wx:if="{{canManage}}" class="tl-act tl-act-del" bindtap="removeEvent" data-id="{{item._id}}">删除</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{canEdit}}" class="fab" bindtap="goAdd">＋</view>
+  <view class="safe-bottom"></view>
+</block>

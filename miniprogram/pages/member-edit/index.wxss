@@ -1,0 +1,50 @@
+.me-photo-row { flex: 1; display: flex; align-items: center; padding: 16rpx 0; }
+.me-photo-wrap { position: relative; }
+.me-photo { width: 120rpx; height: 120rpx; border-radius: 16rpx; }
+.me-photo-del {
+  position: absolute;
+  top: -12rpx;
+  right: -12rpx;
+  width: 36rpx;
+  height: 36rpx;
+  line-height: 34rpx;
+  text-align: center;
+  border-radius: 50%;
+  background: #e64340;
+  color: #fff;
+  font-size: 22rpx;
+}
+.me-photo-add {
+  width: 120rpx;
+  height: 120rpx;
+  border: 2rpx dashed #c9c2b8;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #b5aea3;
+  font-size: 52rpx;
+}
+.me-clear { color: #e64340; font-size: 24rpx; margin-left: 16rpx; padding: 4rpx 10rpx; }
+.me-rel { flex: 1; display: flex; align-items: center; font-size: 28rpx; }
+.me-spouses { flex: 1; display: flex; flex-wrap: wrap; padding: 16rpx 0; }
+.me-spouse-chip {
+  background: #f6f4ee;
+  border: 1rpx solid #ece8e0;
+  border-radius: 999rpx;
+  padding: 6rpx 20rpx;
+  font-size: 26rpx;
+  margin: 0 14rpx 14rpx 0;
+  display: flex;
+  align-items: center;
+}
+.me-spouse-x { color: #b5aea3; margin-left: 10rpx; }
+.me-spouse-add {
+  color: #07c160;
+  font-size: 26rpx;
+  border: 1rpx dashed #07c160;
+  border-radius: 999rpx;
+  padding: 6rpx 20rpx;
+  margin-bottom: 14rpx;
+}
+.form-textarea-wrap { display: block; }

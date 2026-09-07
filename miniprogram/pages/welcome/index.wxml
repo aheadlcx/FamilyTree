@@ -1,0 +1,112 @@
+<view class="safe-bottom">
+  <view class="hero">
+    <view class="hero-title">家族族谱</view>
+    <view class="hero-sub">记录血脉 · 传承家风</view>
+  </view>
+
+  <!-- 微信身份（头像昵称填写能力，替代已废弃的 getUserProfile） -->
+  <view class="card">
+    <view class="h2">微信身份</view>
+    <view class="profile-row">
+      <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+        <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar avatar-ph">像</view>
+      </button>
+      <input
+        class="nick-input"
+        type="nickname"
+        placeholder="填写微信昵称"
+        value="{{nickname}}"
+        bindinput="onNickInput"
+      />
+    </view>
+    <view class="form-tip">头像与昵称将展示给家族成员（通过微信登录自动识别你的身份）</view>
+  </view>
+
+  <!-- 好友分享的邀请 -->
+  <view wx:if="{{invite}}" class="card invite-card">
+    <view class="h2">收到邀请</view>
+    <view class="invite-name">「{{invite.name}}」邀请你加入家族</view>
+    <button class="btn btn-primary" disabled="{{submitting}}" bindtap="joinByInvite">立即加入</button>
+  </view>
+
+  <!-- 我的家族 -->
+  <view wx:if="{{myFamilies.length}}" class="card">
+    <view class="h2">我的家族</view>
+    <view wx:for="{{myFamilies}}" wx:key="familyId" class="cell" bindtap="enterFamily" data-id="{{item.familyId}}">
+      <view>
+        <view class="cell-title">{{item.name}}</view>
+        <view class="muted">{{item.memberCount}} 位族人</view>
+      </view>
+      <view class="cell-right">
+        <text class="tag tag-gold">{{item.role === 'owner' ? '族主' : (item.role === 'admin' ? '管理员' : (item.role === 'editor' ? '编辑员' : '浏览'))}}</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 我的申请 -->
+  <view wx:if="{{myPending.length}}" class="card">
+    <view class="h2">我的申请</view>
+    <view wx:for="{{myPending}}" wx:key="_id" class="cell">
+      <view class="cell-title">{{item.familyName}}</view>
+      <view class="cell-right">
+        <text class="tag {{item.status === 'pending' ? 'tag-gold' : (item.status === 'approved' ? 'tag-green' : 'tag-red')}}">{{item.status === 'pending' ? '审核中' : (item.status === 'approved' ? '已通过' : '已拒绝')}}</text>
+      </view>
+    </view>
+    <button class="btn btn-plain" bindtap="recheck">重新检查状态</button>
+  </view>
+
+  <!-- 主操作 -->
+  <block wx:if="{{step === 'choice'}}">
+    <view class="card">
+      <button class="btn btn-primary" bindtap="toCreate">创建新家族</button>
+      <button class="btn btn-plain" bindtap="toJoin">用邀请码加入</button>
+    </view>
+  </block>
+
+  <block wx:if="{{step === 'create'}}">
+    <view class="card">
+      <view class="h2">创建家族</view>
+      <view class="form-item">
+        <view class="form-label">家族名称</view>
+        <input class="form-input" placeholder="如：张氏家族 / 李家大院" value="{{form.name}}" bindinput="onFormInput" data-k="name" />
+      </view>
+      <view class="form-item">
+        <view class="form-label">姓氏</view>
+        <input class="form-input" placeholder="如：张" value="{{form.surname}}" bindinput="onFormInput" data-k="surname" />
+      </view>
+      <view class="form-item">
+        <view class="form-label">家族简介</view>
+        <input class="form-input" placeholder="祖籍、堂号、家风等（选填）" value="{{form.description}}" bindinput="onFormInput" data-k="description" />
+      </view>
+      <button class="btn btn-primary" disabled="{{submitting}}" bindtap="submitCreate">创建（我将自动成为族主）</button>
+      <button class="btn btn-plain" bindtap="backChoice">返回</button>
+    </view>
+  </block>
+
+  <block wx:if="{{step === 'join'}}">
+    <view class="card">
+      <view class="h2">加入家族</view>
+      <view class="form-item">
+        <view class="form-label">邀请码</view>
+        <input class="form-input" placeholder="向家族管理员索取" value="{{form.code}}" bindinput="onFormInput" data-k="code" />
+      </view>
+      <view class="form-item">
+        <view class="form-label">申请留言</view>
+        <input class="form-input" placeholder="如：我是张三之孙（选填）" value="{{form.message}}" bindinput="onFormInput" data-k="message" />
+      </view>
+      <button class="btn btn-primary" disabled="{{submitting}}" bindtap="submitJoin">提交申请</button>
+      <button class="btn btn-plain" bindtap="backChoice">返回</button>
+    </view>
+  </block>
+
+  <block wx:if="{{step === 'pending'}}">
+    <view class="card">
+      <view class="h2">申请已提交</view>
+      <view class="muted">请等待家族管理员在「我的 → 家族管理」中审核通过。</view>
+    </view>
+  </block>
+
+  <view class="muted" style="text-align:center; padding: 30rpx 0 60rpx;">微信登录 · 云开发 · 数据仅家族内可见</view>
+</view>

@@ -1,0 +1,35 @@
+<view class="card">
+  <view class="form-item">
+    <view class="form-label">标题</view>
+    <input class="form-input" placeholder="如：爷爷八十大寿" value="{{form.title}}" bindinput="onInput" data-k="title" />
+  </view>
+  <view class="form-item">
+    <view class="form-label">日期</view>
+    <picker mode="date" value="{{form.date}}" start="1800-01-01" end="2100-12-31" bindchange="onDate">
+      <view class="form-picker {{!form.date ? 'placeholder' : ''}}">{{form.date || '选择日期'}}</view>
+    </picker>
+  </view>
+</view>
+
+<view class="card">
+  <view class="h2">详情</view>
+  <textarea class="form-textarea" placeholder="记录这件事的来龙去脉…" maxlength="2000" value="{{form.description}}" bindinput="onInput" data-k="description" />
+</view>
+
+<view class="card">
+  <view class="h2">照片（{{form.images.length}}/9）</view>
+  <view class="ee-images">
+    <view wx:for="{{form.images}}" wx:key="*this" class="ee-img-wrap">
+      <image class="ee-img" src="{{item}}" mode="aspectFill" bindtap="previewImage" data-current="{{item}}" />
+      <view class="ee-img-del" catchtap="removeImage" data-idx="{{index}}">✕</view>
+    </view>
+    <view wx:if="{{form.images.length < 9}}" class="ee-img-add" bindtap="chooseImages">＋</view>
+  </view>
+  <view class="form-tip">图片自动上传到云存储，仅家族成员可见</view>
+</view>
+
+<view class="safe-bottom">
+  <button class="btn btn-primary" style="margin: 10rpx 24rpx;" disabled="{{saving}}" bindtap="onSave">
+    {{saving ? '保存中…' : '保存'}}
+  </button>
+</view>

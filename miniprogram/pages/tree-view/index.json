@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "支系视图",
+  "usingComponents": {
+    "tree-node": "../../components/tree-node/index"
+  }
+}

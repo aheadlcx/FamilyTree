@@ -1,0 +1,18 @@
+<view wx:if="{{ready && !roots.length}}" class="empty">
+  <view class="empty-icon">🍃</view>
+  <view>未找到该成员的支系</view>
+</view>
+
+<scroll-view wx:if="{{roots.length}}" class="tv-scroll" scroll-x scroll-y enhanced show-scrollbar="{{false}}">
+  <view class="tv-canvas">
+    <view class="tv-root-hint" wx:if="{{memberName}}">以下为 {{memberName}} 及其后代</view>
+    <view wx:for="{{roots}}" wx:key="_id" class="tv-root">
+      <tree-node
+        node="{{item}}"
+        self-id="{{selfId}}"
+        bind:select="onNodeSelect"
+        bind:action="onNodeAction"
+      />
+    </view>
+  </view>
+</scroll-view>

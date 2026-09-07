@@ -1,0 +1,42 @@
+.st-grid { display: flex; flex-wrap: wrap; }
+.st-cell {
+  width: 25%;
+  text-align: center;
+  padding: 14rpx 0;
+  box-sizing: border-box;
+}
+.st-grid-3 .st-cell { width: 33.33%; }
+.st-num { font-size: 44rpx; font-weight: 700; color: #3b342a; }
+.st-label { color: #9a938a; font-size: 24rpx; margin-top: 4rpx; }
+
+.st-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 0;
+  font-size: 29rpx;
+}
+.st-strong { font-weight: 700; color: #a4762a; }
+
+.st-bar-row {
+  display: flex;
+  align-items: center;
+  padding: 10rpx 0;
+}
+.st-bar-label { width: 130rpx; color: #6b655c; font-size: 25rpx; flex-shrink: 0; }
+.st-bar-track {
+  flex: 1;
+  height: 24rpx;
+  background: #f2efe9;
+  border-radius: 999rpx;
+  overflow: hidden;
+}
+.st-bar-fill {
+  height: 100%;
+  border-radius: 999rpx;
+  background: #07c160;
+  min-width: 6rpx;
+  transition: width 0.4s;
+}
+.st-bar-gold { background: #c9a35c; }
+.st-bar-num { width: 70rpx; text-align: right; color: #9a938a; font-size: 24rpx; flex-shrink: 0; }

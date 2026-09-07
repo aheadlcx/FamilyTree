@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "族谱",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "tree-node": "../../components/tree-node/index"
+  }
+}
