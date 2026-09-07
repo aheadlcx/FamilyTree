@@ -29,7 +29,10 @@ Page({
     pickerShow: false,
     pickerTitle: '选择成员',
     pickerMulti: false,
-    pickerExclude: []
+    pickerExclude: [],
+    pickerAllowCreate: false,
+    pickerDefaultGender: 0,
+    pickerLinkTo: ''
   },
 
   onLoad(options) {
@@ -142,9 +145,34 @@ Page({
   },
 
   /* ---------- 关系选择 ---------- */
-  pickFather() { this._picking = 'father'; this.setData({ pickerShow: true, pickerTitle: '选择父亲', pickerMulti: false, pickerExclude: this._id ? [this._id] : [] }) },
-  pickMother() { this._picking = 'mother'; this.setData({ pickerShow: true, pickerTitle: '选择母亲', pickerMulti: false, pickerExclude: this._id ? [this._id] : [] }) },
-  pickSpouse() { this._picking = 'spouse'; this.setData({ pickerShow: true, pickerTitle: '选择配偶', pickerMulti: false, pickerExclude: this.spouseIds().concat(this._id ? [this._id] : []) }) },
+  pickFather() {
+    this._picking = 'father'
+    this.setData({
+      pickerShow: true, pickerTitle: '选择父亲', pickerMulti: false,
+      pickerExclude: this._id ? [this._id] : [],
+      pickerAllowCreate: true, pickerDefaultGender: 1, pickerLinkTo: ''
+    })
+  },
+  pickMother() {
+    this._picking = 'mother'
+    this.setData({
+      pickerShow: true, pickerTitle: '选择母亲', pickerMulti: false,
+      pickerExclude: this._id ? [this._id] : [],
+      pickerAllowCreate: true, pickerDefaultGender: 2, pickerLinkTo: ''
+    })
+  },
+  pickSpouse() {
+    this._picking = 'spouse'
+    const g = this.data.form.gender
+    this.setData({
+      pickerShow: true, pickerTitle: '选择配偶', pickerMulti: false,
+      pickerExclude: this.spouseIds().concat(this._id ? [this._id] : []),
+      pickerAllowCreate: true,
+      pickerDefaultGender: g === 1 ? 2 : (g === 2 ? 1 : 0),
+      // 编辑模式下新建配偶时，服务端自动把当前成员写回新配偶的 spouseIds
+      pickerLinkTo: this._id || ''
+    })
+  },
   clearFather() { this.setData({ father: null }) },
   clearMother() { this.setData({ mother: null }) },
   removeSpouse(e) {

@@ -64,7 +64,7 @@
   <view wx:if="{{showHelp}}" class="pf-help">
     <view class="pf-help-item"><text class="pf-help-k">① 权限说明</text>族主拥有全部权限；管理员可审批、增删成员、管理家族；编辑员可添加/修改族员与大事记；浏览仅可查看。</view>
     <view class="pf-help-item"><text class="pf-help-k">② 邀请家人</text>在「族谱」页右上角点「邀请」分享给微信好友，或告知邀请码，对方在此页面登录后即可申请加入。</view>
-    <view class="pf-help-item"><text class="pf-help-k">③ 修谱建议</text>先添加始祖（不填父母即为第一世），再依次为每人添加子女，世代数自动计算；配偶通过「编辑资料 → 添加配偶」关联。</view>
+    <view class="pf-help-item"><text class="pf-help-k">③ 修谱建议</text>先添加始祖（不填父母即为第一世），再依次为每人添加子女，世代数自动计算；父母/配偶可在选人弹层中直接新建入谱并自动关联。</view>
     <view class="pf-help-item"><text class="pf-help-k">④ 数据安全</text>所有数据存于你的私有云开发环境，仅家族成员可见；族主可随时导出 JSON 备份。</view>
   </view>
 </view>

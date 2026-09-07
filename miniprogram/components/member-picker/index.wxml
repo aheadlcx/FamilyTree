@@ -1,38 +1,68 @@
 <view wx:if="{{show}}" class="mp-mask" bindtap="close" catch:touchmove="noop">
   <view class="mp-panel" catchtap="noop">
     <view class="mp-header">
-      <view class="mp-title">{{title}}</view>
+      <view class="mp-title">{{mode === 'create' ? '新建成员' : title}}</view>
       <view class="mp-close" bindtap="close">✕</view>
     </view>
-    <view class="mp-search">
-      <input class="mp-search-input" placeholder="搜索姓名 / 职业 / 籍贯" value="{{keyword}}" bindinput="onSearch" />
-    </view>
-    <scroll-view class="mp-list" scroll-y>
-      <view wx:if="{{loading}}" class="mp-empty">加载中…</view>
-      <view wx:elif="{{!list.length}}" class="mp-empty">没有找到成员</view>
-      <block wx:else>
-        <view
-          wx:for="{{list}}"
-          wx:key="_id"
-          class="mp-item {{item._sel ? 'mp-item-active' : ''}} {{item._dis ? 'mp-item-disabled' : ''}}"
-          data-id="{{item._id}}"
-          bindtap="onPick"
-        >
-          <image wx:if="{{item.photoFileId}}" class="mp-avatar" src="{{item.photoFileId}}" mode="aspectFill" />
-          <view wx:else class="mp-avatar mp-avatar-ph g{{item.gender}}">{{item.initial}}</view>
-          <view class="mp-info">
-            <view class="mp-name">{{item.name}} <text class="muted">{{item.years}}</text></view>
-            <view class="muted">{{item.genderName}} · 第{{item.generation + 1}}世</view>
-          </view>
-          <view wx:if="{{item._sel}}" class="mp-check">✓</view>
+
+    <!-- 新建成员（快速入谱） -->
+    <block wx:if="{{mode === 'create'}}">
+      <view class="mp-cform">
+        <view class="form-item">
+          <view class="form-label">姓名</view>
+          <input class="form-input" placeholder="必填" value="{{cform.name}}" bindinput="onCInput" data-k="name" />
         </view>
-        <view class="mp-bottom-space"></view>
-      </block>
-    </scroll-view>
-    <view wx:if="{{multi}}" class="mp-footer">
-      <button class="btn btn-primary" disabled="{{!selectedCount}}" bindtap="onConfirm">
-        确定（已选 {{selectedCount}} 人）
-      </button>
-    </view>
+        <view class="form-item">
+          <view class="form-label">性别</view>
+          <picker mode="selector" range="{{genderRange}}" value="{{cform.gender}}" bindchange="onCGender">
+            <view class="form-picker">{{genderRange[cform.gender]}}</view>
+          </picker>
+        </view>
+        <view class="form-item">
+          <view class="form-label">出生日期</view>
+          <picker mode="date" value="{{cform.birthDate}}" start="1800-01-01" end="2100-12-31" bindchange="onCBirth">
+            <view class="form-picker {{!cform.birthDate ? 'placeholder' : ''}}">{{cform.birthDate || '选择日期（可留空）'}}</view>
+          </picker>
+        </view>
+        <view class="form-tip">先快速入谱{{linkTo ? '并自动双向关联配偶' : ''}}，详细资料可稍后在编辑页补充</view>
+        <button class="btn btn-primary" disabled="{{creating}}" bindtap="onCreateSave">{{creating ? '保存中…' : (linkTo ? '保存并关联' : '保存入谱')}}</button>
+        <button class="btn btn-plain" bindtap="onCreateBack">返回选择列表</button>
+      </view>
+    </block>
+
+    <!-- 从已有成员中选择 -->
+    <block wx:else>
+      <view class="mp-search">
+        <input class="mp-search-input" placeholder="搜索姓名 / 职业 / 籍贯" value="{{keyword}}" bindinput="onSearch" />
+      </view>
+      <scroll-view class="mp-list" scroll-y>
+        <view wx:if="{{loading}}" class="mp-empty">加载中…</view>
+        <view wx:elif="{{!list.length}}" class="mp-empty">没有找到成员</view>
+        <block wx:else>
+          <view
+            wx:for="{{list}}"
+            wx:key="_id"
+            class="mp-item {{item._sel ? 'mp-item-active' : ''}} {{item._dis ? 'mp-item-disabled' : ''}}"
+            data-id="{{item._id}}"
+            bindtap="onPick"
+          >
+            <image wx:if="{{item.photoFileId}}" class="mp-avatar" src="{{item.photoFileId}}" mode="aspectFill" />
+            <view wx:else class="mp-avatar mp-avatar-ph g{{item.gender}}">{{item.initial}}</view>
+            <view class="mp-info">
+              <view class="mp-name">{{item.name}} <text class="muted">{{item.years}}</text></view>
+              <view class="muted">{{item.genderName}} · 第{{item.generation + 1}}世</view>
+            </view>
+            <view wx:if="{{item._sel}}" class="mp-check">✓</view>
+          </view>
+          <view class="mp-bottom-space"></view>
+        </block>
+      </scroll-view>
+      <view wx:if="{{allowCreate && !multi}}" class="mp-create-entry" bindtap="onOpenCreate">＋ 新建成员并关联</view>
+      <view wx:if="{{multi}}" class="mp-footer">
+        <button class="btn btn-primary" disabled="{{!selectedCount}}" bindtap="onConfirm">
+          确定（已选 {{selectedCount}} 人）
+        </button>
+      </view>
+    </block>
   </view>
 </view>

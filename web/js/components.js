@@ -52,17 +52,35 @@
       const selected = {}
       let closed = false
 
+      const dg = Number(o.defaultGender) || 0
+      const opt = (v, label) => '<option value="' + v + '"' + (dg === v ? ' selected' : '') + '>' + label + '</option>'
+      const createEntry = o.allowCreate && !o.multi
+        ? '<button class="btn btn-plain" id="mp-new">＋ 新建成员并关联</button>'
+        : ''
+      const createForm =
+        '<div id="mp-create" style="display:none;">' +
+        '<div class="form-item"><div class="form-label">姓名</div><input class="form-input" id="mp-c-name" placeholder="必填"></div>' +
+        '<div class="form-item"><div class="form-label">性别</div><select class="form-select" id="mp-c-gender">' +
+        opt(0, '未知') + opt(1, '男') + opt(2, '女') +
+        '</select></div>' +
+        '<div class="form-item"><div class="form-label">出生日期</div><input class="form-input" type="date" id="mp-c-birth" min="1800-01-01" max="2100-12-31"></div>' +
+        '<div class="form-tip">先快速入谱' + (o.linkTo ? '并自动双向关联配偶' : '') + '，详细资料可稍后在编辑页补充</div>' +
+        '<button class="btn btn-plain" id="mp-c-cancel">返回选择列表</button>' +
+        '<button class="btn btn-primary" id="mp-c-save">保存' + (o.linkTo ? '并关联' : '入谱') + '</button>' +
+        '</div>'
       const sheet = UI.sheet(
         '<div class="sheet-header">' +
         '<div class="sheet-title">' + esc(o.title || '选择成员') + '</div>' +
         '<span class="sheet-close">✕</span></div>' +
-        '<div class="mp-search"><input id="mp-search-input" placeholder="搜索姓名 / 职业 / 籍贯" /></div>' +
+        '<div class="mp-search" id="mp-search-wrap"><input id="mp-search-input" placeholder="搜索姓名 / 职业 / 籍贯" /></div>' +
         '<div class="mp-list" id="mp-list"><div class="mp-empty">加载中…</div></div>' +
+        createEntry + createForm +
         (o.multi
           ? '<button class="btn btn-primary" id="mp-confirm" disabled>确定（已选 0 人）</button>'
           : '')
       )
       const listEl = sheet.el.querySelector('#mp-list')
+      let familyId = ''
 
       function finish(result) {
         if (closed) return
@@ -134,13 +152,59 @@
       try {
         const ctx = await window.FamilyAPI.call('getFamilyContext', {})
         if (!ctx || !ctx.inFamily) { renderList(); return }
-        const r = await window.FamilyAPI.call('listMembers', { familyId: ctx.family._id })
+        familyId = ctx.family._id
+        const r = await window.FamilyAPI.call('listMembers', { familyId })
         all = r.members
         renderList()
       } catch (e) {
         all = []
         renderList()
       }
+
+      /* ---------- 新建成员并关联 ---------- */
+      const newBtn = sheet.el.querySelector('#mp-new')
+      if (!newBtn) return
+      const searchWrap = sheet.el.querySelector('#mp-search-wrap')
+      const createEl = sheet.el.querySelector('#mp-create')
+      newBtn.addEventListener('click', () => {
+        searchWrap.style.display = 'none'
+        listEl.style.display = 'none'
+        newBtn.style.display = 'none'
+        createEl.style.display = 'block'
+      })
+      sheet.el.querySelector('#mp-c-cancel').addEventListener('click', () => {
+        createEl.style.display = 'none'
+        searchWrap.style.display = ''
+        listEl.style.display = ''
+        newBtn.style.display = ''
+      })
+      sheet.el.querySelector('#mp-c-save').addEventListener('click', async () => {
+        const name = sheet.el.querySelector('#mp-c-name').value.trim()
+        if (!name) { UI.toast('请填写姓名'); return }
+        if (!familyId) { UI.toast('请先加入家族'); return }
+        const saveBtn = sheet.el.querySelector('#mp-c-save')
+        saveBtn.disabled = true
+        try {
+          const gender = Number(sheet.el.querySelector('#mp-c-gender').value) || 0
+          const birthDate = sheet.el.querySelector('#mp-c-birth').value
+          const r = await window.FamilyAPI.call('addMember', {
+            familyId, name, gender, birthDate, isAlive: true,
+            // 编辑模式下选配偶：服务端会同步把对方写回当前成员的 spouseIds
+            spouseIds: o.linkTo ? [o.linkTo] : []
+          })
+          const b = birthDate ? birthDate.slice(0, 4) : ''
+          finish({
+            _id: r.id, name, gender, birthDate,
+            initial: name.charAt(0) || '·',
+            years: b ? b + ' –' : '',
+            isAlive: true, photoFileId: '', generation: 0,
+            birthPlace: '', occupation: ''
+          })
+        } catch (e) {
+          saveBtn.disabled = false
+          UI.toast(e.message)
+        }
+      })
     })
   }
 

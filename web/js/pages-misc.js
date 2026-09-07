@@ -291,7 +291,7 @@
           '<div class="pf-help" id="pf-help" style="display:none;">' +
           '<div class="pf-help-item"><span class="pf-help-k">① 权限说明</span> 族主拥有全部权限；管理员可审批、增删成员、管理家族；编辑员可添加/修改族员与大事记；浏览仅可查看。</div>' +
           '<div class="pf-help-item"><span class="pf-help-k">② 邀请家人</span> 在「族谱」页右上角点「邀请」复制链接/邀请码，切换到另一个演示账号即可申请加入，再切回管理员审批。</div>' +
-          '<div class="pf-help-item"><span class="pf-help-k">③ 修谱建议</span> 先添加始祖（不填父母即为第一世），再依次为每人添加子女，世代数自动计算。</div>' +
+          '<div class="pf-help-item"><span class="pf-help-k">③ 修谱建议</span> 先添加始祖（不填父母即为第一世），再依次为每人添加子女，世代数自动计算；父母/配偶可在选人弹层中直接新建入谱并自动关联。</div>' +
           '<div class="pf-help-item"><span class="pf-help-k">④ 数据安全</span> Web 版数据保存在浏览器 localStorage，与小程序版共用同一套业务逻辑；可随时导出 JSON 备份。</div>' +
           '</div></div>' +
 

@@ -277,7 +277,7 @@
           ).join('') +
           '<span class="me-spouse-add" id="me-pick-spouse">＋ 添加配偶</span>' +
           '</div></div>' +
-          '<div class="form-tip">父母与配偶必须已是本家族成员；世代数会按父母自动计算</div>'
+          '<div class="form-tip">可从列表选择，或在弹层中直接新建入谱并自动关联；世代数会按父母自动计算</div>'
         )
       }
 
@@ -341,7 +341,21 @@
           if (kind === 'spouse') {
             state.spouses.forEach(s => exclude.push(s._id))
           }
-          const m = await C().memberPicker({ title: kind === 'father' ? '选择父亲' : (kind === 'mother' ? '选择母亲' : '选择配偶'), exclude })
+          let defaultGender = 0
+          if (kind === 'father') defaultGender = 1
+          else if (kind === 'mother') defaultGender = 2
+          else if (kind === 'spouse') {
+            const g = state.form.gender
+            defaultGender = g === 1 ? 2 : (g === 2 ? 1 : 0)
+          }
+          const m = await C().memberPicker({
+            title: kind === 'father' ? '选择父亲' : (kind === 'mother' ? '选择母亲' : '选择配偶'),
+            exclude,
+            allowCreate: true,
+            defaultGender,
+            // 编辑模式下新建配偶时，服务端自动把当前成员写回新配偶的 spouseIds
+            linkTo: kind === 'spouse' && isEdit ? params.id : ''
+          })
           if (!m) return
           if (kind === 'father') state.father = m
           else if (kind === 'mother') state.mother = m

@@ -66,3 +66,13 @@
 .mp-empty { text-align: center; color: #b5aea3; padding: 100rpx 0; }
 .mp-footer { padding: 16rpx 0 calc(20rpx + env(safe-area-inset-bottom)); }
 .mp-bottom-space { height: 20rpx; }
+.mp-create-entry {
+  margin: 8rpx 0 4rpx;
+  border: 1rpx dashed #07c160;
+  color: #07c160;
+  border-radius: 12rpx;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 28rpx;
+}
+.mp-cform { padding-bottom: calc(20rpx + env(safe-area-inset-bottom)); }

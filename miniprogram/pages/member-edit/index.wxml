@@ -98,7 +98,7 @@
       <view class="me-spouse-add" bindtap="pickSpouse">＋ 添加配偶</view>
     </view>
   </view>
-  <view class="form-tip">父母与配偶必须已是本家族成员；世代数会按父母自动计算</view>
+  <view class="form-tip">可从列表选择，或在弹层中直接新建入谱并自动关联；世代数会按父母自动计算</view>
 </view>
 
 <view class="safe-bottom">
@@ -112,6 +112,9 @@
   title="{{pickerTitle}}"
   multi="{{pickerMulti}}"
   exclude="{{pickerExclude}}"
+  allow-create="{{pickerAllowCreate}}"
+  default-gender="{{pickerDefaultGender}}"
+  link-to="{{pickerLinkTo}}"
   bind:pick="onPicked"
   bind:close="onPickerClose"
 />
