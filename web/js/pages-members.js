@@ -317,20 +317,37 @@
         bind()
       }
 
+      // 重渲染前把 DOM 中已填写的值同步回 state.form，避免用户输入丢失
+      function syncForm() {
+        const f = state.form
+        const $ = id => view.querySelector(id)
+        const nameEl = $('#me-name'); if (nameEl) f.name = nameEl.value
+        const genderEl = $('#me-gender'); if (genderEl) f.gender = Number(genderEl.value)
+        const birthEl = $('#me-birth'); if (birthEl) f.birthDate = birthEl.value
+        const deathEl = $('#me-death'); if (deathEl) f.deathDate = deathEl.value
+        const aliveEl = $('#me-alive'); if (aliveEl) f.isAlive = aliveEl.checked
+        const placeEl = $('#me-place'); if (placeEl) f.birthPlace = placeEl.value
+        const occEl = $('#me-occ'); if (occEl) f.occupation = occEl.value
+        const phoneEl = $('#me-phone'); if (phoneEl) f.phone = phoneEl.value
+        const bioEl = $('#me-bio'); if (bioEl) f.bio = bioEl.value
+      }
+
       function bind() {
         UI.bindNavbar(view)
         const $ = id => view.querySelector(id)
         const on = (id, fn) => { const el = $(id); if (el) el.onclick = fn }
 
         on('#me-photo-add', async () => {
+          syncForm()
           const img = await UI.chooseImage(400)
           if (img) { state.form.photoFileId = img; render() }
         })
-        on('#me-photo-del', () => { state.form.photoFileId = ''; render() })
+        on('#me-photo-del', () => { syncForm(); state.form.photoFileId = ''; render() })
         on('#me-photo', () => { if (state.form.photoFileId) window.open(state.form.photoFileId) })
 
         const alive = $('#me-alive')
         if (alive) alive.addEventListener('change', () => {
+          syncForm()
           state.form.isAlive = alive.checked
           if (alive.checked) state.form.deathDate = ''
           render()
@@ -385,18 +402,8 @@
         bindRel()
 
         on('#me-save', async () => {
+          syncForm()
           const f = state.form
-          f.name = $('#me-name').value
-          f.gender = Number($('#me-gender').value)
-          f.birthDate = $('#me-birth').value
-          const aliveEl = $('#me-alive')
-          if (aliveEl) f.isAlive = aliveEl.checked
-          const deathEl = $('#me-death')
-          f.deathDate = deathEl ? deathEl.value : ''
-          f.birthPlace = $('#me-place').value
-          f.occupation = $('#me-occ').value
-          f.phone = $('#me-phone').value
-          f.bio = $('#me-bio').value
           if (!f.name.trim()) { UI.toast('请填写姓名'); return }
           if (state.father && state.mother && state.father._id === state.mother._id) { UI.toast('父母不能是同一人'); return }
           try {
