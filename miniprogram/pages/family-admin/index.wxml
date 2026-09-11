@@ -33,6 +33,19 @@
       </view>
     </view>
     <view class="form-tip">点邀请码可复制。新成员也可以通过输入邀请码申请加入。</view>
+    <view class="fa-qr-row">
+      <image
+        wx:if="{{qrFileId}}"
+        class="fa-qr-img"
+        src="{{qrFileId}}"
+        mode="widthFix"
+        show-menu-by-longpress="{{true}}"
+      />
+      <button class="btn-mini btn-plain" disabled="{{qrLoading}}" bindtap="loadQr">
+        {{qrLoading ? '生成中…' : (qrFileId ? '刷新小程序码' : '生成小程序码')}}
+      </button>
+    </view>
+    <view wx:if="{{qrFileId}}" class="form-tip">家人长按小程序码识别后即可进入加入页（线上版本生效）</view>
     <view class="divider"></view>
     <view class="form-item">
       <view class="form-label">自动通过</view>

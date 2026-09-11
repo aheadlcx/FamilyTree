@@ -34,7 +34,17 @@
           return '<div class="empty"><div class="empty-icon">🍃</div><div>' +
             (state.all.length ? '没有符合条件的人' : '还没有族人，点击右下角 + 添加') + '</div></div>'
         }
-        return '<div class="card" style="padding:4px 14px;">' + list.map(m =>
+        // 按世代分组展示（组头 + 组内人数）
+        const counts = {}
+        list.forEach(m => { const g = m.generation || 0; counts[g] = (counts[g] || 0) + 1 })
+        let lastGen = null
+        return '<div class="card" style="padding:4px 14px;">' + list.map(m => {
+          const g = m.generation || 0
+          const head = g !== lastGen
+            ? '<div class="ml-gen">第' + (g + 1) + '世 · ' + counts[g] + ' 人</div>'
+            : ''
+          lastGen = g
+          return head +
           '<div class="cell" data-id="' + m._id + '">' +
           (m.photoFileId
             ? '<img class="ml-avatar" src="' + m.photoFileId + '">'
@@ -43,9 +53,9 @@
           (m._id === state.selfId ? ' <span class="tag tag-green">我</span>' : '') +
           (m.isAlive === false ? ' <span class="tag tag-gray">故</span>' : '') +
           '</div><div class="muted">' + (m.gender === 1 ? '男' : (m.gender === 2 ? '女' : '未知')) +
-          ' · 第' + ((m.generation || 0) + 1) + '世 · ' + esc(m.years || '生卒不详') + '</div></div>' +
+          ' · ' + esc(m.years || '生卒不详') + '</div></div>' +
           '<span class="arrow">›</span></div>'
-        ).join('') + '</div>'
+        }).join('') + '</div>'
       }
 
       function renderList() {

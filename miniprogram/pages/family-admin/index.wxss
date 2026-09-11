@@ -30,6 +30,18 @@
 .fa-invite-ops { margin-left: 24rpx; display: flex; flex-direction: column; }
 .fa-invite-ops .btn-mini { margin: 8rpx 0 0; }
 .fa-invite-ops .btn-mini:first-child { margin-top: 0; }
+.fa-qr-row {
+  display: flex;
+  align-items: center;
+  margin-top: 20rpx;
+}
+.fa-qr-img {
+  width: 220rpx;
+  height: 220rpx;
+  margin-right: 20rpx;
+  background: #fff;
+  border: 1rpx solid #f2efe9;
+}
 
 .fa-log {
   display: flex;

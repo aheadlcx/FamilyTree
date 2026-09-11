@@ -15,6 +15,19 @@
     if (!ts) return ''
     return fmtTime(ts).slice(0, 10)
   }
+  // 相对时间（朋友圈式）：刚刚 / n分钟前 / n小时前 / n天前 / 超过30天显示日期
+  function timeAgo(ts) {
+    if (!ts) return ''
+    const diff = Date.now() - ts
+    const m = Math.floor(diff / 60000)
+    if (m < 1) return '刚刚'
+    if (m < 60) return m + '分钟前'
+    const h = Math.floor(m / 60)
+    if (h < 24) return h + '小时前'
+    const d = Math.floor(h / 24)
+    if (d < 30) return d + '天前'
+    return fmtDay(ts)
+  }
 
   /* ---------- Toast ---------- */
   let toastTimer = null
@@ -207,7 +220,7 @@
   }
 
   window.UI = {
-    esc, fmtTime, fmtDay, toast, loading, hideLoading,
+    esc, fmtTime, fmtDay, timeAgo, toast, loading, hideLoading,
     confirm, prompt, actionSheet, sheet, closeModal, lightbox,
     fileToDataURL, chooseImage, navbarHtml, bindNavbar
   }

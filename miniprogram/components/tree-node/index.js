@@ -12,6 +12,10 @@ Component({
     onLongPress(e) {
       this.triggerEvent('action', { id: e.currentTarget.dataset.id })
     },
+    // 卡片右上角「⋯」：与长按等效，提升可发现性
+    onMore(e) {
+      this.triggerEvent('action', { id: e.currentTarget.dataset.id })
+    },
     onChildSelect(e) {
       this.triggerEvent('select', e.detail)
     },

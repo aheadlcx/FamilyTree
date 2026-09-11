@@ -16,7 +16,16 @@ Page({
   },
 
   onLoad(options) {
-    this._inviteCode = options.code || ''
+    // 好友分享带 code 参数；扫描小程序码带 scene（形如 c=XXXXXX）
+    let code = options.code || ''
+    if (!code && options.scene) {
+      const scene = decodeURIComponent(options.scene)
+      scene.split('&').forEach(kv => {
+        const pair = kv.split('=')
+        if (pair[0] === 'c') code = pair[1] || ''
+      })
+    }
+    this._inviteCode = code
     this.load()
   },
 

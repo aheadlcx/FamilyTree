@@ -34,11 +34,12 @@
       years: yearsLabel(m),
       isAlive: m.isAlive !== false,
       photoFileId: m.photoFileId || '',
-      generation: m.generation || 0,
-      birthPlace: m.birthPlace || '',
-      occupation: m.occupation || ''
-    }
+    generation: m.generation || 0,
+    birthDate: m.birthDate || '',
+    birthPlace: m.birthPlace || '',
+    occupation: m.occupation || ''
   }
+}
   function byBirth(a, b) {
     const x = a.birthDate || '9999', y = b.birthDate || '9999'
     if (x === y) return 0

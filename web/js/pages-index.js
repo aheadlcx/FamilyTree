@@ -63,6 +63,40 @@
         const canManage = ['admin', 'owner'].indexOf(ctx.role) >= 0
         document.title = (ctx.family.name || '家族族谱') + ' · Web 版'
 
+        // 近 30 天寿星提醒（从树上的全部成员收集出生日期）
+        const people = []
+        const seen = {}
+        const collect = n => {
+          if (!n || seen[n._id]) return
+          seen[n._id] = true
+          people.push(n)
+          ;(n.spouses || []).forEach(s => { if (!seen[s._id]) { seen[s._id] = true; people.push(s) } })
+          ;(n.children || []).forEach(collect)
+        }
+        tree.roots.forEach(collect)
+        const now = new Date()
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+        const birthdays = people
+          .filter(p => p.isAlive !== false && p.birthDate && p.birthDate.length >= 10)
+          .map(p => {
+            const mm = Number(p.birthDate.slice(5, 7)), dd = Number(p.birthDate.slice(8, 10))
+            if (isNaN(mm) || isNaN(dd)) return null
+            let next = new Date(now.getFullYear(), mm - 1, dd)
+            if (next < today) next = new Date(now.getFullYear() + 1, mm - 1, dd)
+            const days = Math.round((next - today) / 86400000)
+            return { _id: p._id, name: p.name, md: mm + '月' + dd + '日', days }
+          })
+          .filter(x => x && x.days <= 30)
+          .sort((a, b) => a.days - b.days)
+          .slice(0, 3)
+        const bdHtml = birthdays.length
+          ? '<div class="bd-banner"><span class="bd-icon">🎂</span><span class="bd-label">近期寿星</span>' +
+            birthdays.map(b =>
+              '<span class="bd-item" data-id="' + b._id + '">' + UI.esc(b.name) + '·' + b.md +
+              (b.days === 0 ? '（今天）' : '（还有' + b.days + '天）') + '</span>'
+            ).join('') + '</div>'
+          : ''
+
         const toolbar =
           '<div class="toolbar"><div class="toolbar-left" id="i-stats" style="cursor:pointer;">' +
           '<div class="toolbar-family">' + UI.esc(ctx.family.name) + '</div>' +
@@ -84,8 +118,11 @@
             tree.roots.map(r => '<div class="tree-root">' + window.Components.treeNodeHtml(r, tree.selfMemberId) + '</div>').join('') +
             '</div></div>'
         }
-        view.innerHTML = toolbar + body
+        view.innerHTML = toolbar + bdHtml + body
 
+        view.querySelectorAll('.bd-item').forEach(el => {
+          el.onclick = () => App.go('/member-detail?id=' + el.getAttribute('data-id'))
+        })
         view.querySelector('#i-stats').onclick = () => App.go('/stats')
         const selfBtn = view.querySelector('#i-self')
         if (selfBtn) selfBtn.onclick = () => App.go('/tree-view?id=' + tree.selfMemberId)

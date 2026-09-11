@@ -27,10 +27,18 @@ Page({
       }
       app.setContext(c)
       return api.call('listEvents', { familyId: c.family._id }).then(r => {
+        // 按年份分组标记（每当年份切换时显示年份标题）
+        let lastYear = ''
+        const events = r.events.map(e => {
+          const y = (e.date || '').slice(0, 4)
+          const showYear = !!y && y !== lastYear
+          if (showYear) lastYear = y
+          return Object.assign({}, e, { year: y, showYear })
+        })
         this.setData({
           ready: true,
           noFamily: false,
-          events: r.events.map(e => Object.assign(e, { dateLabel: e.date, timeLabel: util.fmtDay(e.createdAt) })),
+          events,
           canEdit: util.canEdit(c.role),
           canManage: util.canManage(c.role)
         })

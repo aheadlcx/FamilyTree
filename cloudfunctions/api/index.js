@@ -42,6 +42,7 @@ function slim(m) {
     isAlive: m.isAlive !== false,
     photoFileId: m.photoFileId || '',
     generation: m.generation || 0,
+    birthDate: m.birthDate || '',
     birthPlace: m.birthPlace || '',
     occupation: m.occupation || ''
   }
@@ -376,6 +377,33 @@ async function regenerateInviteCode(openid, familyId) {
   await db.collection('families').doc(familyId).update({ data: { inviteCode: code, updatedAt: Date.now() } })
   await addLog(familyId, openid, 'regenerateInviteCode', code)
   return { inviteCode: code }
+}
+// 生成小程序码：scene 携带邀请码，扫码直达欢迎页加入流程
+async function getInviteQr(openid, familyId) {
+  await requireRole(openid, familyId, 'admin')
+  const fam = await db.collection('families').doc(familyId).get().catch(() => null)
+  if (!fam || !fam.data) throw ApiError('家族不存在')
+  const code = fam.data.inviteCode
+  let wxres
+  try {
+    wxres = await cloud.openapi.wxacode.getUnlimited({
+      scene: 'c=' + code,
+      page: 'pages/welcome/index',
+      checkPath: false,
+      width: 430
+    })
+  } catch (e) {
+    throw ApiError('生成小程序码失败：' + (e.errMsg || e.message || '请检查云函数 openapi 权限'))
+  }
+  if (wxres.errCode && wxres.errCode !== 0) {
+    throw ApiError('生成小程序码失败：' + (wxres.errMsg || wxres.errCode))
+  }
+  const up = await cloud.uploadFile({
+    cloudPath: 'qrcode/' + familyId + '-' + Date.now() + '.png',
+    fileContent: wxres.buffer
+  })
+  await addLog(familyId, openid, 'getInviteQr', code)
+  return { fileId: up.fileID, inviteCode: code }
 }
 async function previewInvite(d) {
   const code = String(d.code || '').trim().toUpperCase()
@@ -940,6 +968,7 @@ exports.main = async (event) => {
       case 'switchFamily': return ok(await switchFamily(OPENID, event.familyId))
       case 'updateFamily': return ok(await updateFamily(OPENID, event.familyId, event))
       case 'regenerateInviteCode': return ok(await regenerateInviteCode(OPENID, event.familyId))
+      case 'getInviteQr': return ok(await getInviteQr(OPENID, event.familyId))
       case 'previewInvite': return ok(await previewInvite(event))
       case 'joinFamily': return ok(await joinFamily(OPENID, event))
       case 'listJoinRequests': return ok(await listJoinRequests(OPENID, event.familyId))

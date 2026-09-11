@@ -25,6 +25,19 @@
     </view>
   </view>
 
+  <!-- 近 30 天寿星提醒 -->
+  <view wx:if="{{birthdays.length}}" class="bd-banner">
+    <text class="bd-icon">🎂</text>
+    <text class="bd-label">近期寿星</text>
+    <text
+      wx:for="{{birthdays}}"
+      wx:key="_id"
+      class="bd-item"
+      bindtap="goMember"
+      data-id="{{item._id}}"
+    >{{item.name}}·{{item.md}}{{item.days === 0 ? '（今天）' : ''}}</text>
+  </view>
+
   <view wx:if="{{!roots.length}}" class="empty">
     <view class="empty-icon">🌱</view>
     <view>族谱还是空的</view>

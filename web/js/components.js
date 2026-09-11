@@ -146,6 +146,9 @@
         listEl.style.display = ''
         newBtn.style.display = ''
       })
+      sheet.el.querySelector('#mp-c-name').addEventListener('keydown', e => {
+        if (e.key === 'Enter') sheet.el.querySelector('#mp-c-save').click()
+      })
       sheet.el.querySelector('#mp-c-save').addEventListener('click', async () => {
         const name = sheet.el.querySelector('#mp-c-name').value.trim()
         if (!name) { UI.toast('请填写姓名'); return }

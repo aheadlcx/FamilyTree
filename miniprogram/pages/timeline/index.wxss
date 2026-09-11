@@ -19,6 +19,13 @@
   margin-bottom: 14rpx;
 }
 .tl-title { font-size: 33rpx; font-weight: 600; }
+/* 年份分组标题 */
+.tl-year {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #a4762a;
+  margin-bottom: 8rpx;
+}
 .tl-desc {
   font-size: 28rpx;
   color: #5c564d;

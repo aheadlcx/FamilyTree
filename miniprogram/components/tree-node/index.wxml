@@ -6,6 +6,7 @@
       bindlongpress="onLongPress"
       data-id="{{node._id}}"
     >
+      <text class="tn-more" catch:tap="onMore" data-id="{{node._id}}">⋯</text>
       <image wx:if="{{node.photoFileId}}" class="tn-photo" src="{{node.photoFileId}}" mode="aspectFill" lazy-load="{{true}}" />
       <view wx:else class="tn-photo tn-ph g{{node.gender}}">{{node.initial}}</view>
       <view class="tn-name">{{node.name}}<text wx:if="{{node.isAlive === false}}" class="tn-cross">†</text></view>
@@ -23,6 +24,7 @@
         bindlongpress="onLongPress"
         data-id="{{item._id}}"
       >
+        <text class="tn-more" catch:tap="onMore" data-id="{{item._id}}">⋯</text>
         <image wx:if="{{item.photoFileId}}" class="tn-photo" src="{{item.photoFileId}}" mode="aspectFill" lazy-load="{{true}}" />
         <view wx:else class="tn-photo tn-ph g{{item.gender}}">{{item.initial}}</view>
         <view class="tn-name">{{item.name}}<text wx:if="{{item.isAlive === false}}" class="tn-cross">†</text></view>

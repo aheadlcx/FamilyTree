@@ -12,6 +12,8 @@ Page({
     family: null,
     /* 邀请 */
     inviteCode: '',
+    qrFileId: '',
+    qrLoading: false,
     autoApprove: false,
     defaultRoleIdx: 0,
     roleOptions: util.ROLE_OPTION_NAMES,
@@ -70,11 +72,11 @@ Page({
         }))
         this.setData({
           pending: reqs.requests.map(r => Object.assign(r, {
-            timeLabel: util.fmtTime(r.createdAt),
+            timeLabel: util.timeAgo(r.createdAt),
             initial: util.initialOf(r.nickname)
           })),
           users,
-          logs: logs.logs.map(l => Object.assign(l, { timeLabel: util.fmtTime(l.createdAt) }))
+          logs: logs.logs.map(l => Object.assign(l, { timeLabel: util.timeAgo(l.createdAt) }))
         })
       })
     }).catch(e => {
@@ -94,10 +96,27 @@ Page({
       success: res => {
         if (!res.confirm) return
         api.call('regenerateInviteCode', { familyId: this.data.family._id })
-          .then(r => { this.setData({ inviteCode: r.inviteCode }); wx.showToast({ title: '已更换', icon: 'success' }) })
+          .then(r => {
+            this.setData({ inviteCode: r.inviteCode, qrFileId: '' })
+            wx.showToast({ title: '已更换', icon: 'success' })
+          })
           .catch(e => api.toastErr(e))
       }
     })
+  },
+  // 生成小程序码（scene 携带邀请码，扫码直达加入页）
+  loadQr() {
+    if (this.data.qrLoading) return
+    this.setData({ qrLoading: true })
+    api.call('getInviteQr', { familyId: this.data.family._id })
+      .then(r => {
+        this.setData({ qrFileId: r.fileId, qrLoading: false })
+        wx.setClipboardData({ data: r.inviteCode, fail: () => {} })
+      })
+      .catch(e => {
+        this.setData({ qrLoading: false })
+        api.toastErr(e)
+      })
   },
   onAutoApprove(e) {
     const v = e.detail.value

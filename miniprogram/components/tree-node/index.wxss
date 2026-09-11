@@ -19,6 +19,17 @@
   padding: 14rpx 10rpx;
   text-align: center;
   box-shadow: 0 2rpx 8rpx rgba(80, 60, 20, 0.06);
+  position: relative;
+}
+/* 卡片右上角快捷菜单 */
+.tn-more {
+  position: absolute;
+  top: 2rpx;
+  right: 4rpx;
+  color: #c9c2b8;
+  font-size: 26rpx;
+  line-height: 1;
+  padding: 4rpx 6rpx;
 }
 .tn-spouse {
   background: #fbfaf6;

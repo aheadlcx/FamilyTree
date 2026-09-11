@@ -3,6 +3,36 @@ const api = require('../../utils/api')
 const util = require('../../utils/util')
 const app = getApp()
 
+// 从族谱树收集近 30 天寿星（树上覆盖全部成员：主节点 + 配偶卡 + 子孙）
+function collectBirthdays(roots) {
+  const people = []
+  const seen = {}
+  const collect = n => {
+    if (!n || seen[n._id]) return
+    seen[n._id] = true
+    people.push(n)
+    ;(n.spouses || []).forEach(s => { if (!seen[s._id]) { seen[s._id] = true; people.push(s) } })
+    ;(n.children || []).forEach(collect)
+  }
+  ;(roots || []).forEach(collect)
+  const now = new Date()
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  return people
+    .filter(p => p.isAlive !== false && p.birthDate && p.birthDate.length >= 10)
+    .map(p => {
+      const mm = Number(p.birthDate.slice(5, 7))
+      const dd = Number(p.birthDate.slice(8, 10))
+      if (isNaN(mm) || isNaN(dd)) return null
+      let next = new Date(now.getFullYear(), mm - 1, dd)
+      if (next < today) next = new Date(now.getFullYear() + 1, mm - 1, dd)
+      const days = Math.round((next - today) / 86400000)
+      return { _id: p._id, name: p.name, md: mm + '月' + dd + '日', days }
+    })
+    .filter(x => x && x.days <= 30)
+    .sort((a, b) => a.days - b.days)
+    .slice(0, 3)
+}
+
 Page({
   data: {
     ready: false,
@@ -12,7 +42,8 @@ Page({
     total: 0,
     selfId: '',
     canEdit: false,
-    canManage: false
+    canManage: false,
+    birthdays: []
   },
 
   onShow() {
@@ -28,6 +59,7 @@ Page({
       }
       app.setContext(ctx)
       return api.call('getTree', { familyId: ctx.family._id }).then(tree => {
+        const birthdays = collectBirthdays(tree.roots)
         this.setData({
           ready: true,
           noFamily: false,
@@ -36,7 +68,8 @@ Page({
           total: tree.total,
           selfId: tree.selfMemberId || '',
           canEdit: util.canEdit(ctx.role),
-          canManage: util.canManage(ctx.role)
+          canManage: util.canManage(ctx.role),
+          birthdays
         })
         wx.setNavigationBarTitle({ title: ctx.family.name || '家族族谱' })
       })
@@ -52,6 +85,16 @@ Page({
 
   onNodeSelect(e) {
     wx.navigateTo({ url: '/pages/member-detail/index?id=' + e.detail.id })
+  },
+
+  goMember(e) {
+    wx.navigateTo({ url: '/pages/member-detail/index?id=' + e.currentTarget.dataset.id })
+  },
+
+  // 转发到朋友圈
+  onShareTimeline() {
+    const f = this.data.ctx && this.data.ctx.family
+    return { title: f ? '「' + f.name + '」家族族谱' : '家族族谱' }
   },
 
   onNodeAction(e) {

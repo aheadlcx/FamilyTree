@@ -74,6 +74,15 @@ Page({
         (m.birthPlace || '').toLowerCase().indexOf(kw) >= 0 ||
         (m.occupation || '').toLowerCase().indexOf(kw) >= 0
     })
+    // 按世代分组（组头 + 组内人数）
+    const counts = {}
+    list.forEach(m => { const g = m.generation || 0; counts[g] = (counts[g] || 0) + 1 })
+    let lastGen = null
+    list.forEach(m => {
+      const g = m.generation || 0
+      m._gs = g !== lastGen
+      if (m._gs) { m._gc = counts[g]; lastGen = g }
+    })
     this.setData({ list })
   },
 

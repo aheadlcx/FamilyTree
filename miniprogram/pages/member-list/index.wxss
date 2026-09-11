@@ -36,3 +36,10 @@
 .ml-ph.g0 { background: #c9c2b8; }
 .ml-info { flex: 1; min-width: 0; }
 .ml-name { font-size: 31rpx; font-weight: 600; }
+/* 世代分组头 */
+.ml-gen {
+  padding: 24rpx 0 10rpx;
+  color: #a4762a;
+  font-size: 26rpx;
+  font-weight: 600;
+}

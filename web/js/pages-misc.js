@@ -38,9 +38,15 @@
 
         const body = !r.events.length
           ? '<div class="empty"><div class="empty-icon">📜</div><div>还没有大事记</div><div class="muted" style="margin-top:6px;">婚丧嫁娶、寿诞、团圆、乔迁…都值得记录</div></div>'
-          : '<div class="tl-wrap">' + r.events.map(e =>
-            '<div class="card tl-item"><span class="tl-dot-line"></span>' +
-            '<span class="tl-date">' + esc(e.date) + '</span>' +
+          : '<div class="tl-wrap">' + (() => {
+            let lastYear = ''
+            return r.events.map(e => {
+              const y = (e.date || '').slice(0, 4)
+              const showYear = !!y && y !== lastYear
+              if (showYear) lastYear = y
+              return '<div class="card tl-item"><span class="tl-dot-line"></span>' +
+              (showYear ? '<div class="tl-year">' + esc(y) + '</div>' : '') +
+              '<span class="tl-date">' + esc(e.date) + '</span>' +
             '<div class="tl-title">' + esc(e.title) + '</div>' +
             (e.description ? '<div class="tl-desc">' + esc(e.description) + '</div>' : '') +
             (e.images.length
@@ -52,7 +58,8 @@
                 (canManage ? '<span class="tl-act tl-act-del" data-del="' + e._id + '">删除</span>' : '') + '</span>'
               : '') +
             '</div></div>'
-          ).join('') + '</div>'
+            }).join('') + '</div>'
+          })()
 
         view.innerHTML = body + (canEdit ? '<button class="fab" id="tl-add">＋</button>' : '')
         const add = view.querySelector('#tl-add')
@@ -386,7 +393,7 @@
           : reqs.requests.map(rq =>
             '<div class="cell" style="cursor:default;">' + av(rq) +
             '<div class="fa-mid"><div class="cell-title">' + esc(rq.nickname) + '</div>' +
-            '<div class="muted">' + esc(rq.message || UI.fmtTime(rq.createdAt)) + '</div></div>' +
+            '<div class="muted">' + esc(rq.message || UI.timeAgo(rq.createdAt)) + '</div></div>' +
             '<div class="fa-ops"><button class="btn-mini btn-primary" data-ok="' + rq._id + '">通过</button>' +
             '<button class="btn-mini btn-warn" data-no="' + rq._id + '">拒绝</button></div></div>'
           ).join('')
@@ -413,7 +420,7 @@
             '<div class="fa-log"><div><span class="fa-log-op">' + esc(l.operator) + '</span>' +
             '<span class="fa-log-act">' + esc(l.action) + '</span>' +
             (l.detail ? '<span class="muted"> · ' + esc(l.detail) + '</span>' : '') +
-            '</div><span class="muted">' + UI.fmtTime(l.createdAt) + '</span></div>').join('')
+            '</div><span class="muted" title="' + esc(UI.fmtTime(l.createdAt)) + '">' + UI.timeAgo(l.createdAt) + '</span></div>').join('')
 
         view.innerHTML = UI.navbarHtml('家族管理') +
 

@@ -828,6 +828,54 @@ button { cursor: pointer; }
   z-index: 210;
 }
 
+/* ---------- 交互反馈（Web 端习惯） ---------- */
+.cell, .mp-item, .tool-btn, .md-chip { transition: background .15s, border-color .15s, color .15s; }
+.cell:hover, .mp-item:not(.disabled):hover { background: #faf9f5; }
+.tool-btn:not(.green):hover { border-color: #07c160; color: #07c160; }
+.chip { transition: all .15s; }
+.chip:hover { border-color: #07c160; color: #07c160; }
+.chip.active:hover { color: #fff; }
+.btn { transition: filter .15s; }
+.btn:hover { filter: brightness(1.04); }
+.form-item:focus-within { border-bottom-color: #07c160; }
+.form-input:focus, .form-select:focus, .form-textarea:focus, .nick-input:focus,
+.search-input:focus, .mp-search input:focus, .modal-input:focus { outline: none; }
+
+/* ---------- 近期寿星横幅 ---------- */
+.bd-banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 8px 12px 0;
+  background: #fffdf6;
+  border: 1px solid #f0dcb4;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 12px;
+  color: #6b655c;
+}
+.bd-icon { margin-right: 4px; }
+.bd-label { margin-right: 4px; }
+.bd-item { color: #a4762a; margin-right: 8px; cursor: pointer; }
+.bd-item:hover { text-decoration: underline; }
+
+/* ---------- 成员列表世代分组头 ---------- */
+.ml-gen {
+  padding: 12px 0 5px;
+  color: #a4762a;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ml-gen:first-child { padding-top: 10px; }
+
+/* ---------- 大事记年份分组 ---------- */
+.tl-year {
+  font-size: 17px;
+  font-weight: 700;
+  color: #a4762a;
+  margin-bottom: 3px;
+}
+
 /* 图片灯箱 */
 .lb-mask {
   z-index: 150;

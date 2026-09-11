@@ -14,6 +14,7 @@
   <view wx:else class="tl-wrap">
     <view wx:for="{{events}}" wx:key="_id" class="card tl-item">
       <view class="tl-dot-line"></view>
+      <view wx:if="{{item.showYear}}" class="tl-year">{{item.year}}</view>
       <view class="tl-date">{{item.date}}</view>
       <view class="tl-title">{{item.title}}</view>
       <view wx:if="{{item.description}}" class="tl-desc">{{item.description}}</view>

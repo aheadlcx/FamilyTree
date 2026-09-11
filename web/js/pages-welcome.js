@@ -176,6 +176,17 @@
 
         on('#w-switch', () => App.showAccountSwitcher())
 
+        // 回车提交（Web 端键盘习惯）
+        const enter = (id, fn) => {
+          const el = $(id)
+          if (el) el.addEventListener('keydown', ev => { if (ev.key === 'Enter') fn() })
+        }
+        enter('#f-name', () => { const b = $('#w-submit-create'); if (b) b.click() })
+        enter('#f-surname', () => { const b = $('#w-submit-create'); if (b) b.click() })
+        enter('#f-desc', () => { const b = $('#w-submit-create'); if (b) b.click() })
+        enter('#f-code', () => { const b = $('#w-submit-join'); if (b) b.click() })
+        enter('#f-msg', () => { const b = $('#w-submit-join'); if (b) b.click() })
+
         view.querySelectorAll('[data-enter]').forEach(el => {
           el.onclick = async () => {
             try {
