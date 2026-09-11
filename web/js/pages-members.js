@@ -172,7 +172,7 @@
 
         UI.bindNavbar(view)
         const photo = view.querySelector('#md-photo')
-        if (photo) photo.onclick = () => window.open(m.photoFileId)
+        if (photo) photo.onclick = () => UI.lightbox(m.photoFileId)
         const bind = (id, fn) => { const el = view.querySelector(id); if (el) el.onclick = fn }
         bind('#md-branch', () => App.go('/tree-view?id=' + m._id))
         bind('#md-self', async () => {
@@ -339,11 +339,11 @@
 
         on('#me-photo-add', async () => {
           syncForm()
-          const img = await UI.chooseImage(400)
+          const img = await UI.chooseImage(360)
           if (img) { state.form.photoFileId = img; render() }
         })
         on('#me-photo-del', () => { syncForm(); state.form.photoFileId = ''; render() })
-        on('#me-photo', () => { if (state.form.photoFileId) window.open(state.form.photoFileId) })
+        on('#me-photo', () => { if (state.form.photoFileId) UI.lightbox(state.form.photoFileId) })
 
         const alive = $('#me-alive')
         if (alive) alive.addEventListener('change', () => {

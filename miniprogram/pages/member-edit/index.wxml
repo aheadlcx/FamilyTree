@@ -110,7 +110,6 @@
 <member-picker
   show="{{pickerShow}}"
   title="{{pickerTitle}}"
-  multi="{{pickerMulti}}"
   exclude="{{pickerExclude}}"
   allow-create="{{pickerAllowCreate}}"
   default-gender="{{pickerDefaultGender}}"

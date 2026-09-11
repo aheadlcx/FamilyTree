@@ -75,3 +75,17 @@
 </view>
 
 <view class="safe-bottom"></view>
+
+<!-- 切换家族弹层 -->
+<view wx:if="{{showSwitcher}}" class="pf-mask" bindtap="closeSwitcher">
+  <view class="pf-sheet" catchtap="noop">
+    <view class="h2">切换家族</view>
+    <view wx:for="{{myFamilies}}" wx:key="familyId" class="cell" bindtap="doSwitchFamily" data-id="{{item.familyId}}">
+      <view class="cell-title">{{item.name}}{{item.isCurrent ? '（当前）' : ''}}</view>
+      <view class="cell-right">
+        <text class="tag tag-gold">{{item.roleName}}</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+  </view>
+</view>

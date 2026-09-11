@@ -58,16 +58,9 @@
         const add = view.querySelector('#tl-add')
         if (add) add.onclick = () => App.go('/event-edit')
 
-        const imgMap = {}
-        r.events.forEach(ev => { imgMap[ev._id] = ev.images })
         view.onclick = async e => {
           const img = e.target.closest('[data-img]')
-          if (img && window.open) {
-            const imgs = imgMap[img.getAttribute('data-img')]
-            const w = window.open(imgs[0])
-            void w
-            return
-          }
+          if (img) { UI.lightbox(img.getAttribute('src')); return }
           const ed = e.target.closest('[data-edit]')
           if (ed) { App.go('/event-edit?id=' + ed.getAttribute('data-edit')); return }
           const del = e.target.closest('[data-del]')
@@ -136,12 +129,12 @@
             return
           }
           const pv = e.target.closest('[data-pv]')
-          if (pv) window.open(state.images[Number(pv.getAttribute('data-pv'))])
+          if (pv) UI.lightbox(state.images[Number(pv.getAttribute('data-pv'))])
         })
         function bind2() {
           const addBtn = imagesEl.querySelector('#ee-add')
           if (addBtn) addBtn.onclick = async () => {
-            const img = await UI.chooseImage(500)
+            const img = await UI.chooseImage(480)
             if (img) {
               state.images.push(img)
               imagesEl.innerHTML = imgHtml()
@@ -305,7 +298,7 @@
         const rerender = () => this.render()
 
         $('#pf-avatar-btn').onclick = async () => {
-          const img = await UI.chooseImage(200)
+          const img = await UI.chooseImage(160, 0.7)
           if (!img) return
           try {
             await api().call('updateProfile', { avatarUrl: img })

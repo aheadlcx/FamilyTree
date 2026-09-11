@@ -8,7 +8,6 @@ Component({
   properties: {
     show: { type: Boolean, value: false },
     title: { type: String, value: '选择成员' },
-    multi: { type: Boolean, value: false },
     exclude: { type: Array, value: [] },
     // 是否显示「新建成员并关联」入口（选父母/配偶时开启）
     allowCreate: { type: Boolean, value: false },
@@ -23,7 +22,6 @@ Component({
     all: [],
     list: [],
     keyword: '',
-    selectedCount: 0,
     mode: 'list', // list | create
     creating: false,
     genderRange: ['未知', '男', '女'],
@@ -32,7 +30,7 @@ Component({
   observers: {
     show(v) {
       if (v && !this.data.loaded) this.load()
-      if (v) this.setData({ keyword: '', selectedCount: 0, mode: 'list' })
+      if (v) this.setData({ keyword: '', mode: 'list' })
     }
   },
   methods: {
@@ -59,7 +57,6 @@ Component({
     applyFilter() {
       const kw = (this.data.keyword || '').toLowerCase()
       const exclude = this.properties.exclude || []
-      const selected = this._selected || {}
       const list = this.data.all
         .filter(m => {
           if (!kw) return true
@@ -68,7 +65,6 @@ Component({
             (m.occupation || '').toLowerCase().indexOf(kw) >= 0
         })
         .map(m => Object.assign({}, m, {
-          _sel: !!selected[m._id],
           _dis: exclude.indexOf(m._id) >= 0
         }))
       this.setData({ list })
@@ -82,24 +78,10 @@ Component({
       if ((this.properties.exclude || []).indexOf(id) >= 0) return
       const m = this.data.all.find(x => x._id === id)
       if (!m) return
-      if (!this.properties.multi) {
-        this.triggerEvent('pick', { member: m })
-        this.close()
-        return
-      }
-      this._selected = this._selected || {}
-      if (this._selected[id]) delete this._selected[id]
-      else this._selected[id] = true
-      this.setData({ selectedCount: Object.keys(this._selected).length })
-      this.applyFilter()
-    },
-    onConfirm() {
-      const members = this.data.all.filter(m => this._selected && this._selected[m._id])
-      this.triggerEvent('pickmultiple', { members })
+      this.triggerEvent('pick', { member: m })
       this.close()
     },
     close() {
-      this._selected = {}
       this.triggerEvent('close')
     },
     noop() {},
@@ -128,7 +110,8 @@ Component({
     async onCreateSave() {
       const f = this.data.cform
       if (!f.name.trim()) { wx.showToast({ title: '请填写姓名', icon: 'none' }); return }
-      if (this.data.creating || !this._familyId) return
+      if (!this._familyId) { wx.showToast({ title: '正在加载，请稍后再试', icon: 'none' }); return }
+      if (this.data.creating) return
       this.setData({ creating: true })
       try {
         const r = await api.call('addMember', {

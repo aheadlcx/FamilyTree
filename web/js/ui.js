@@ -118,8 +118,8 @@
     })
   }
 
-  // 通用底部弹层：给 html，返回 { el, close }；点遮罩关闭
-  function sheet(html) {
+  // 通用底部弹层：给 html；点遮罩关闭时会回调 onClose（用于挂起中的 Promise 收尾）
+  function sheet(html, onClose) {
     const btn = document.createElement('div')
     btn.className = 'mask'
     btn.innerHTML = '<div class="sheet-wrap">' + html + '</div>'
@@ -133,15 +133,30 @@
       }
     }
     btn.addEventListener('click', e => {
-      if (e.target === btn) api.close()
+      if (e.target === btn) {
+        api.close()
+        if (onClose) onClose()
+      }
     })
     const x = wrap.querySelector('.sheet-close')
     if (x) x.addEventListener('click', () => api.close())
     return api
   }
 
+  // 图片灯箱预览（点击关闭）。替代 window.open(data:) —— 后者会被浏览器拦截
+  function lightbox(src) {
+    if (!src) return
+    const el = document.createElement('div')
+    el.className = 'mask lb-mask'
+    el.innerHTML = '<img class="lb-img" src="' + src + '" alt="">'
+    modalRoot().appendChild(el)
+    el.addEventListener('click', () => {
+      if (el.parentNode) el.parentNode.removeChild(el)
+    })
+  }
+
   /* ---------- 图片压缩（对应小程序 chooseMedia compressed + 云存储） ---------- */
-  function fileToDataURL(file, maxSide) {
+  function fileToDataURL(file, maxSide, quality) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.onload = () => {
@@ -155,7 +170,7 @@
             canvas.width = w
             canvas.height = h
             canvas.getContext('2d').drawImage(img, 0, 0, w, h)
-            resolve(canvas.toDataURL('image/jpeg', 0.72))
+            resolve(canvas.toDataURL('image/jpeg', quality || 0.68))
           } catch (err) { reject(err) }
         }
         img.onerror = reject
@@ -166,7 +181,7 @@
     })
   }
   // 触发文件选择（对应 wx.chooseMedia）
-  function chooseImage(maxSide) {
+  function chooseImage(maxSide, quality) {
     return new Promise(resolve => {
       const input = document.createElement('input')
       input.type = 'file'
@@ -177,7 +192,7 @@
         const f = input.files && input.files[0]
         document.body.removeChild(input)
         if (!f) { resolve(null); return }
-        fileToDataURL(f, maxSide).then(resolve).catch(() => resolve(null))
+        fileToDataURL(f, maxSide, quality).then(resolve).catch(() => resolve(null))
       })
       input.click()
     })
@@ -193,7 +208,7 @@
 
   window.UI = {
     esc, fmtTime, fmtDay, toast, loading, hideLoading,
-    confirm, prompt, actionSheet, sheet, closeModal,
+    confirm, prompt, actionSheet, sheet, closeModal, lightbox,
     fileToDataURL, chooseImage, navbarHtml, bindNavbar
   }
 })()

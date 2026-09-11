@@ -11,7 +11,8 @@ Page({
     myFamilies: [],
     myPending: [],
     selfMemberName: '',
-    showHelp: false
+    showHelp: false,
+    showSwitcher: false
   },
 
   onShow() {
@@ -40,6 +41,7 @@ Page({
           api.call('listMyFamilies', {}).catch(() => ({ families: [] })),
           api.call('myPendingRequests', {}).catch(() => ({ requests: [] }))
         ]).then(([fams, pend]) => {
+          fams.families.forEach(f => { f.roleName = util.roleName(f.role) })
           this.setData({ myFamilies: fams.families, myPending: pend.requests })
         })
       })
@@ -72,22 +74,27 @@ Page({
 
   /* ---------- 家族 ---------- */
   switchFamily() {
-    const fams = this.data.myFamilies
-    if (!fams.length) return
-    wx.showActionSheet({
-      itemList: fams.map(f => f.name + (f.isCurrent ? '（当前）' : '')),
-      success: res => {
-        const f = fams[res.tapIndex]
-        if (!f || f.isCurrent) return
-        api.call('switchFamily', { familyId: f.familyId })
-          .then(() => {
-            app.clearContext()
-            wx.showToast({ title: '已切换', icon: 'success' })
-            this.load()
-          })
-          .catch(e => api.toastErr(e))
-      }
-    })
+    // wx.showActionSheet 上限 6 项，改用自定义弹层
+    if (!this.data.myFamilies.length) return
+    this.setData({ showSwitcher: true })
+  },
+  closeSwitcher() {
+    this.setData({ showSwitcher: false })
+  },
+  noop() {},
+  async doSwitchFamily(e) {
+    const id = e.currentTarget.dataset.id
+    const f = this.data.myFamilies.find(x => x.familyId === id)
+    if (!f || f.isCurrent) { this.setData({ showSwitcher: false }); return }
+    try {
+      await api.call('switchFamily', { familyId: id })
+      app.clearContext()
+      this.setData({ showSwitcher: false })
+      wx.showToast({ title: '已切换', icon: 'success' })
+      this.load()
+    } catch (err) {
+      api.toastErr(err)
+    }
   },
   goAdmin() {
     wx.navigateTo({ url: '/pages/family-admin/index' })

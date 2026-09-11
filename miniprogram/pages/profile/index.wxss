@@ -42,3 +42,21 @@
 .pf-help-item { margin-bottom: 16rpx; }
 .pf-help-item:last-child { margin-bottom: 0; }
 .pf-help-k { color: #a4762a; font-weight: 600; }
+
+/* 切换家族弹层 */
+.pf-mask {
+  position: fixed;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+.pf-sheet {
+  width: 100%;
+  background: #fff;
+  border-radius: 28rpx 28rpx 0 0;
+  padding: 28rpx 28rpx calc(30rpx + env(safe-area-inset-bottom));
+  max-height: 60vh;
+  overflow-y: scroll;
+}

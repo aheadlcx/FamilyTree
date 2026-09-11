@@ -92,7 +92,7 @@
         const avatarBtn = $('#w-avatar-btn')
         if (avatarBtn) {
           avatarBtn.onclick = async () => {
-            const img = await UI.chooseImage(200)
+            const img = await UI.chooseImage(160, 0.7)
             if (img) { state.avatarUrl = img; rerender() }
           }
         }

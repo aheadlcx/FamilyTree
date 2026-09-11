@@ -57,12 +57,7 @@
           <view class="mp-bottom-space"></view>
         </block>
       </scroll-view>
-      <view wx:if="{{allowCreate && !multi}}" class="mp-create-entry" bindtap="onOpenCreate">＋ 新建成员并关联</view>
-      <view wx:if="{{multi}}" class="mp-footer">
-        <button class="btn btn-primary" disabled="{{!selectedCount}}" bindtap="onConfirm">
-          确定（已选 {{selectedCount}} 人）
-        </button>
-      </view>
+      <view wx:if="{{allowCreate}}" class="mp-create-entry" bindtap="onOpenCreate">＋ 新建成员并关联</view>
     </block>
   </view>
 </view>

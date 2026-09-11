@@ -827,3 +827,18 @@ button { cursor: pointer; }
   border-radius: 10px;
   z-index: 210;
 }
+
+/* 图片灯箱 */
+.lb-mask {
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+.lb-img {
+  max-width: 94vw;
+  max-height: 86vh;
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0,0,0,.5);
+}

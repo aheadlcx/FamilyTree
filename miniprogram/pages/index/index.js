@@ -90,7 +90,8 @@ Page({
 
   onShareAppMessage() {
     const f = this.data.ctx && this.data.ctx.family
-    if (!f) return { title: '家族族谱', path: '/pages/index/index' }
+    // 邀请码仅管理角色持有；浏览/编辑成员转发时回退为普通分享
+    if (!f || !f.inviteCode) return { title: '家族族谱', path: '/pages/index/index' }
     return {
       title: '邀请你加入「' + f.name + '」，共修族谱',
       path: '/pages/welcome/index?code=' + f.inviteCode,

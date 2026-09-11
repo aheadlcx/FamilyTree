@@ -19,6 +19,7 @@ function fail(msg, code) { return { ok: false, msg: String(msg || '服务错误'
 
 /* ================= 通用工具 ================= */
 
+function clone(x) { return JSON.parse(JSON.stringify(x)) }
 function initialOf(name) {
   const s = String(name || '').trim()
   return s ? s.charAt(0) : '·'
@@ -49,6 +50,20 @@ function byBirth(a, b) {
   const x = a.birthDate || '9999', y = b.birthDate || '9999'
   if (x === y) return 0
   return x < y ? -1 : 1
+}
+// 按完整日期计算寿命，无法精确时退化为年份差
+function fullAge(birth, death) {
+  if (!birth || !death) return null
+  if (birth.length < 10 || death.length < 10) {
+    const y = Number(death.slice(0, 4)) - Number(birth.slice(0, 4))
+    return isNaN(y) ? null : y
+  }
+  const by = Number(birth.slice(0, 4)), bm = Number(birth.slice(5, 7)), bd = Number(birth.slice(8, 10))
+  const dy = Number(death.slice(0, 4)), dm = Number(death.slice(5, 7)), dd = Number(death.slice(8, 10))
+  if (isNaN(by) || isNaN(bm) || isNaN(bd) || isNaN(dy) || isNaN(dm) || isNaN(dd)) return null
+  let age = dy - by
+  if (dm < bm || (dm === bm && dd < bd)) age--
+  return age
 }
 
 async function getUser(openid) {
@@ -150,29 +165,33 @@ function createsCycle(selfId, parentId, byId) {
   }
   return false
 }
-// 从根开始重算全家族世代（小家族可接受）
+// 世代重算：父母规则优先，其次配偶同世代（嫁入/娶入者跟随配偶的世代）
 async function recalcGenerations(familyId) {
   const all = await fetchAll(db.collection('members').where({ familyId }))
   const byId = {}
   all.forEach(m => { byId[m._id] = m })
-  const children = {}
-  all.forEach(m => {
-    const pid = primaryParentId(m, byId)
-    if (pid) (children[pid] = children[pid] || []).push(m)
-  })
-  const q = all.filter(m => !primaryParentId(m, byId))
-  const seen = {}
-  q.forEach(m => { seen[m._id] = 0 })
+  const gen = {}
+  all.forEach(m => { gen[m._id] = 0 })
+  // 不动点迭代：父/母有谱则 +1；否则跟随配偶。链长不超过成员数，必收敛
+  let changed = true
   let guard = 0
-  while (q.length && guard++ < 100000) {
-    const cur = q.shift()
-    const g = seen[cur._id] || 0
-    if ((cur.generation || 0) !== g) {
-      await db.collection('members').doc(cur._id).update({ data: { generation: g } }).catch(() => {})
-    }
-    ;(children[cur._id] || []).forEach(c => {
-      if (seen[c._id] === undefined) { seen[c._id] = g + 1; q.push(c) }
+  while (changed && guard++ < all.length + 5) {
+    changed = false
+    all.forEach(m => {
+      let g = 0
+      if (m.fatherId && gen[m.fatherId] !== undefined) g = gen[m.fatherId] + 1
+      else if (m.motherId && gen[m.motherId] !== undefined) g = gen[m.motherId] + 1
+      else {
+        const sid = (m.spouseIds || []).find(s => byId[s])
+        if (sid !== undefined) g = gen[sid]
+      }
+      if (g !== gen[m._id]) { gen[m._id] = g; changed = true }
     })
+  }
+  for (const m of all) {
+    if ((m.generation || 0) !== gen[m._id]) {
+      await db.collection('members').doc(m._id).update({ data: { generation: gen[m._id] } }).catch(() => {})
+    }
   }
 }
 
@@ -302,13 +321,20 @@ async function getFamilyContext(openid, familyId) {
   if (!fam || !fam.data) return { inFamily: false, user: { nickname: u.nickname, avatarUrl: u.avatarUrl } }
   const countRes = await db.collection('members').where({ familyId: fid }).count()
   let pendingCount = 0
-  if ((ROLE_RANK[ref.role] || 0) >= ROLE_RANK.admin) {
+  const isAdmin = (ROLE_RANK[ref.role] || 0) >= ROLE_RANK.admin
+  if (isAdmin) {
     const p = await db.collection('joinRequests').where({ familyId: fid, status: 'pending' }).count()
     pendingCount = p.total
   }
+  // 邀请码与创建者 openid 仅管理角色可见，避免浏览/编辑成员越权拉人或泄露他人身份
+  const familyData = clone(fam.data)
+  if (!isAdmin) {
+    delete familyData.inviteCode
+    delete familyData.creatorOpenid
+  }
   return {
     inFamily: true,
-    family: fam.data,
+    family: familyData,
     role: ref.role,
     memberCount: countRes.total,
     pendingCount,
@@ -363,7 +389,6 @@ async function joinFamily(openid, d) {
   if (!code) throw ApiError('请输入邀请码')
   await checkText(d.message)
   const u = await ensureUser(openid)
-  if (refOf(u, undefined)) { /* noop */ }
   const famRes = await db.collection('families').where({ inviteCode: code }).limit(1).get()
   if (!famRes.data.length) throw ApiError('邀请码无效')
   const fam = famRes.data[0]
@@ -568,6 +593,8 @@ async function addMember(openid, familyId, d) {
   await checkText(d.bio)
   const data = pickMemberData(d)
   if (!data.name) throw ApiError('请填写姓名')
+  if (data.fatherId && data.fatherId === data.motherId) throw ApiError('父母不能是同一人')
+  if (data.birthDate && data.deathDate && data.deathDate < data.birthDate) throw ApiError('逝世日期不能早于出生日期')
   const spouseIds = (Array.isArray(d.spouseIds) ? d.spouseIds : []).filter(Boolean).slice(0, 8)
   const linkIds = [data.fatherId, data.motherId].concat(spouseIds).filter(Boolean)
   let othersMap = {}
@@ -618,11 +645,16 @@ async function updateMember(openid, id, d) {
     }
     data.spouseIds = next
   }
+  // 生效后的父母/生卒校验（防止只改其中一个字段时绕过）
+  const nFather = data.fatherId !== undefined ? data.fatherId : (m.fatherId || '')
+  const nMother = data.motherId !== undefined ? data.motherId : (m.motherId || '')
+  if (nFather && nFather === nMother) throw ApiError('父母不能是同一人')
+  const nBirth = data.birthDate !== undefined ? data.birthDate : (m.birthDate || '')
+  const nDeath = data.deathDate !== undefined ? data.deathDate : (m.deathDate || '')
+  if (nBirth && nDeath && nDeath < nBirth) throw ApiError('逝世日期不能早于出生日期')
   const fatherChanged = data.fatherId !== undefined && data.fatherId !== (m.fatherId || '')
   const motherChanged = data.motherId !== undefined && data.motherId !== (m.motherId || '')
   if (fatherChanged || motherChanged) {
-    const nFather = data.fatherId !== undefined ? data.fatherId : m.fatherId
-    const nMother = data.motherId !== undefined ? data.motherId : m.motherId
     const all = await fetchAll(db.collection('members').where({ familyId: m.familyId }))
     const byId = {}
     all.forEach(x => { byId[x._id] = x })
@@ -782,8 +814,8 @@ async function getStats(openid, familyId) {
       }
     }
     if (m.isAlive === false && m.birthDate && m.deathDate) {
-      const age = Number(m.deathDate.slice(0, 4)) - Number(m.birthDate.slice(0, 4))
-      if (!isNaN(age) && age >= 0 && age < 150) {
+      const age = fullAge(m.birthDate, m.deathDate)
+      if (age !== null && age >= 0 && age < 150) {
         lifeSum += age
         lifeN++
         if (!oldest || age > oldest.age) oldest = { name: m.name, age }

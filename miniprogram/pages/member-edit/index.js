@@ -28,7 +28,6 @@ Page({
     spouses: [],
     pickerShow: false,
     pickerTitle: '选择成员',
-    pickerMulti: false,
     pickerExclude: [],
     pickerAllowCreate: false,
     pickerDefaultGender: 0,
@@ -45,11 +44,10 @@ Page({
   },
 
   async init() {
-    const app2 = getApp()
-    let ctx = app2.globalData.context
+    let ctx = app.globalData.context
     if (!ctx || !ctx.family) {
       ctx = await api.call('getFamilyContext', {})
-      if (ctx && ctx.inFamily) app2.setContext(ctx)
+      if (ctx && ctx.inFamily) app.setContext(ctx)
     }
     this._familyId = ctx && ctx.inFamily ? ctx.family._id : ''
     if (this._id) {
@@ -148,7 +146,7 @@ Page({
   pickFather() {
     this._picking = 'father'
     this.setData({
-      pickerShow: true, pickerTitle: '选择父亲', pickerMulti: false,
+      pickerShow: true, pickerTitle: '选择父亲',
       pickerExclude: this._id ? [this._id] : [],
       pickerAllowCreate: true, pickerDefaultGender: 1, pickerLinkTo: ''
     })
@@ -156,7 +154,7 @@ Page({
   pickMother() {
     this._picking = 'mother'
     this.setData({
-      pickerShow: true, pickerTitle: '选择母亲', pickerMulti: false,
+      pickerShow: true, pickerTitle: '选择母亲',
       pickerExclude: this._id ? [this._id] : [],
       pickerAllowCreate: true, pickerDefaultGender: 2, pickerLinkTo: ''
     })
@@ -165,7 +163,7 @@ Page({
     this._picking = 'spouse'
     const g = this.data.form.gender
     this.setData({
-      pickerShow: true, pickerTitle: '选择配偶', pickerMulti: false,
+      pickerShow: true, pickerTitle: '选择配偶',
       pickerExclude: this.spouseIds().concat(this._id ? [this._id] : []),
       pickerAllowCreate: true,
       pickerDefaultGender: g === 1 ? 2 : (g === 2 ? 1 : 0),

@@ -59,6 +59,8 @@ Page({
     let avatarUrl = this.data.avatarUrl
     if (avatarUrl && avatarUrl.indexOf('cloud://') !== 0 && avatarUrl.indexOf('http') !== 0) {
       avatarUrl = await util.uploadImage(avatarUrl, 'avatars')
+      // 回写为云文件 ID，重复提交时不再上传
+      this.setData({ avatarUrl })
     }
     await api.call('updateProfile', { nickname: this.data.nickname, avatarUrl })
   },

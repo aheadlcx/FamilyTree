@@ -44,6 +44,20 @@
     if (x === y) return 0
     return x < y ? -1 : 1
   }
+  // 按完整日期计算寿命，无法精确时退化为年份差
+  function fullAge(birth, death) {
+    if (!birth || !death) return null
+    if (birth.length < 10 || death.length < 10) {
+      const y = Number(death.slice(0, 4)) - Number(birth.slice(0, 4))
+      return isNaN(y) ? null : y
+    }
+    const by = Number(birth.slice(0, 4)), bm = Number(birth.slice(5, 7)), bd = Number(birth.slice(8, 10))
+    const dy = Number(death.slice(0, 4)), dm = Number(death.slice(5, 7)), dd = Number(death.slice(8, 10))
+    if (isNaN(by) || isNaN(bm) || isNaN(bd) || isNaN(dy) || isNaN(dm) || isNaN(dd)) return null
+    let age = dy - by
+    if (dm < bm || (dm === bm && dd < bd)) age--
+    return age
+  }
   function clone(x) { return JSON.parse(JSON.stringify(x)) }
 
   /* ================ 用户 ================ */
@@ -116,27 +130,29 @@
     const all = DB.load().members.filter(m => m.familyId === familyId)
     const byId = {}
     all.forEach(m => { byId[m._id] = m })
-    const children = {}
-    all.forEach(m => {
-      const pid = primaryParentId(m, byId)
-      if (pid) (children[pid] = children[pid] || []).push(m)
-    })
-    const q = all.filter(m => !primaryParentId(m, byId))
-    const seen = {}
-    q.forEach(m => { seen[m._id] = 0 })
+    const gen = {}
+    all.forEach(m => { gen[m._id] = 0 })
+    // 不动点迭代：父/母有谱则 +1；否则跟随配偶（嫁入/娶入者同世代）。必收敛
+    let changed = true
     let guard = 0
-    while (q.length && guard++ < 100000) {
-      const cur = q.shift()
-      const g = seen[cur._id] || 0
-      if ((cur.generation || 0) !== g) cur.generation = g
-      ;(children[cur._id] || []).forEach(c => {
-        if (seen[c._id] === undefined) { seen[c._id] = g + 1; q.push(c) }
+    while (changed && guard++ < all.length + 5) {
+      changed = false
+      all.forEach(m => {
+        let g = 0
+        if (m.fatherId && gen[m.fatherId] !== undefined) g = gen[m.fatherId] + 1
+        else if (m.motherId && gen[m.motherId] !== undefined) g = gen[m.motherId] + 1
+        else {
+          const sid = (m.spouseIds || []).find(s => byId[s])
+          if (sid !== undefined) g = gen[sid]
+        }
+        if (g !== gen[m._id]) { gen[m._id] = g; changed = true }
       })
     }
+    all.forEach(m => { m.generation = gen[m._id] })
   }
   function pickMemberData(d) {
     const out = {}
-    const strs = { name: 60, birthDate: 20, deathDate: 20, birthPlace: 60, occupation: 60, phone: 30, bio: 2000, photoFileId: 500000 }
+    const strs = { name: 60, birthDate: 20, deathDate: 20, birthPlace: 60, occupation: 60, phone: 30, bio: 2000, photoFileId: 300000 }
     Object.keys(strs).forEach(k => {
       if (d[k] !== undefined) out[k] = String(d[k] || '').slice(0, strs[k])
     })
@@ -174,7 +190,7 @@
     updateProfile(openid, d) {
       const u = ensureUser(openid)
       if (d.nickname !== undefined) u.nickname = String(d.nickname || '').slice(0, 30)
-      if (d.avatarUrl !== undefined) u.avatarUrl = String(d.avatarUrl || '').slice(0, 500000)
+      if (d.avatarUrl !== undefined) u.avatarUrl = String(d.avatarUrl || '').slice(0, 300000)
       return {}
     },
     listMyFamilies(openid) {
@@ -242,12 +258,19 @@
       const fam = DB.load().families.find(x => x._id === fid)
       if (!fam) return Object.assign({ inFamily: false }, base)
       let pendingCount = 0
-      if ((ROLE_RANK[ref.role] || 0) >= ROLE_RANK.admin) {
+      const isAdmin = (ROLE_RANK[ref.role] || 0) >= ROLE_RANK.admin
+      if (isAdmin) {
         pendingCount = DB.load().joinRequests.filter(r => r.familyId === fid && r.status === 'pending').length
+      }
+      // 邀请码与创建者 openid 仅管理角色可见
+      const family = clone(fam)
+      if (!isAdmin) {
+        delete family.inviteCode
+        delete family.creatorOpenid
       }
       return {
         inFamily: true,
-        family: clone(fam),
+        family,
         role: ref.role,
         memberCount: membersOf(fid).length,
         pendingCount,
@@ -478,6 +501,8 @@
       requireRole(openid, d.familyId, 'editor')
       const data = pickMemberData(d)
       if (!data.name) throw ApiError('请填写姓名')
+      if (data.fatherId && data.fatherId === data.motherId) throw ApiError('父母不能是同一人')
+      if (data.birthDate && data.deathDate && data.deathDate < data.birthDate) throw ApiError('逝世日期不能早于出生日期')
       const spouseIds = (Array.isArray(d.spouseIds) ? d.spouseIds : []).filter(Boolean).slice(0, 8)
       const linkIds = [data.fatherId, data.motherId].concat(spouseIds).filter(Boolean)
       let othersMap = {}
@@ -537,11 +562,16 @@
         })
         m.spouseIds = next
       }
+      // 生效后的父母/生卒校验（防止只改其中一个字段时绕过）
+      const nFather = data.fatherId !== undefined ? data.fatherId : (m.fatherId || '')
+      const nMother = data.motherId !== undefined ? data.motherId : (m.motherId || '')
+      if (nFather && nFather === nMother) throw ApiError('父母不能是同一人')
+      const nBirth = data.birthDate !== undefined ? data.birthDate : (m.birthDate || '')
+      const nDeath = data.deathDate !== undefined ? data.deathDate : (m.deathDate || '')
+      if (nBirth && nDeath && nDeath < nBirth) throw ApiError('逝世日期不能早于出生日期')
       const fatherChanged = data.fatherId !== undefined && data.fatherId !== (m.fatherId || '')
       const motherChanged = data.motherId !== undefined && data.motherId !== (m.motherId || '')
       if (fatherChanged || motherChanged) {
-        const nFather = data.fatherId !== undefined ? data.fatherId : m.fatherId
-        const nMother = data.motherId !== undefined ? data.motherId : m.motherId
         const byId = {}
         membersOf(m.familyId).forEach(x => { byId[x._id] = x })
         ;[nFather, nMother].forEach(pid => {
@@ -694,8 +724,8 @@
           }
         }
         if (m.isAlive === false && m.birthDate && m.deathDate) {
-          const age = Number(m.deathDate.slice(0, 4)) - Number(m.birthDate.slice(0, 4))
-          if (!isNaN(age) && age >= 0 && age < 150) {
+          const age = fullAge(m.birthDate, m.deathDate)
+          if (age !== null && age >= 0 && age < 150) {
             lifeSum += age
             lifeN++
             if (!oldest || age > oldest.age) oldest = { name: m.name, age }

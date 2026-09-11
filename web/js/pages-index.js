@@ -46,9 +46,9 @@
   window.Pages.index = {
     async render() {
       App.showTabbar('index')
-      const view = document.getElementById('view')
-      try {
-        const ctx = await api().call('getFamilyContext', {})
+        const view = document.getElementById('view')
+        try {
+          const ctx = await api().call('getFamilyContext', {})
         if (!ctx || !ctx.inFamily) {
           App.clearContext()
           view.innerHTML =
@@ -71,7 +71,8 @@
           '<div class="toolbar-right">' +
           (tree.selfMemberId ? '<span class="tool-btn" id="i-self">📍我</span>' : '') +
           (canManage ? '<span class="tool-btn" id="i-admin">管理' + (ctx.pendingCount ? '<span class="badge-dot">' + ctx.pendingCount + '</span>' : '') + '</span>' : '') +
-          '<span class="tool-btn green" id="i-invite">邀请</span>' +
+          // 邀请码仅管理角色可见（与云函数 getFamilyContext 的脱敏规则一致）
+          (canManage ? '<span class="tool-btn green" id="i-invite">邀请</span>' : '') +
           '</div></div>'
 
         let body
@@ -90,12 +91,15 @@
         if (selfBtn) selfBtn.onclick = () => App.go('/tree-view?id=' + tree.selfMemberId)
         const adminBtn = view.querySelector('#i-admin')
         if (adminBtn) adminBtn.onclick = () => App.go('/family-admin')
-        view.querySelector('#i-invite').onclick = () => {
-          const url = location.href.split('#')[0] + '#/welcome?code=' + ctx.family.inviteCode
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(url).then(() => UI.toast('邀请链接已复制'))
-          } else {
-            UI.actionSheet(['邀请码：' + ctx.family.inviteCode + '（请记录）'])
+        const inviteBtn = view.querySelector('#i-invite')
+        if (inviteBtn) {
+          inviteBtn.onclick = () => {
+            const url = location.href.split('#')[0] + '#/welcome?code=' + ctx.family.inviteCode
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(url).then(() => UI.toast('邀请链接已复制'))
+            } else {
+              UI.toast('邀请码：' + ctx.family.inviteCode)
+            }
           }
         }
 

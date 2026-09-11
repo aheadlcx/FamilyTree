@@ -42,19 +42,19 @@
   }
 
   /* ---------- 成员选择器（对应 member-picker 组件） ----------
-     opts: { title, multi, exclude: [id] }
-     返回 Promise：单选 → member | null；多选 → members[] */
+     opts: { title, exclude: [id], allowCreate, defaultGender, linkTo }
+     返回 Promise：member | null（关闭/遮罩取消均返回 null） */
   function memberPicker(opts) {
     const o = opts || {}
     return new Promise(async resolve => {
       let all = []
       let keyword = ''
-      const selected = {}
       let closed = false
+      let familyId = ''
 
       const dg = Number(o.defaultGender) || 0
       const opt = (v, label) => '<option value="' + v + '"' + (dg === v ? ' selected' : '') + '>' + label + '</option>'
-      const createEntry = o.allowCreate && !o.multi
+      const createEntry = o.allowCreate
         ? '<button class="btn btn-plain" id="mp-new">＋ 新建成员并关联</button>'
         : ''
       const createForm =
@@ -74,13 +74,10 @@
         '<span class="sheet-close">✕</span></div>' +
         '<div class="mp-search" id="mp-search-wrap"><input id="mp-search-input" placeholder="搜索姓名 / 职业 / 籍贯" /></div>' +
         '<div class="mp-list" id="mp-list"><div class="mp-empty">加载中…</div></div>' +
-        createEntry + createForm +
-        (o.multi
-          ? '<button class="btn btn-primary" id="mp-confirm" disabled>确定（已选 0 人）</button>'
-          : '')
+        createEntry + createForm,
+        () => finish(null) // 点遮罩关闭也要收尾
       )
       const listEl = sheet.el.querySelector('#mp-list')
-      let familyId = ''
 
       function finish(result) {
         if (closed) return
@@ -107,13 +104,12 @@
         listEl.innerHTML = list.map(m => {
           const dis = exclude.indexOf(m._id) >= 0
           return (
-            '<div class="mp-item' + (selected[m._id] ? ' active' : '') + (dis ? ' disabled' : '') + '" data-id="' + m._id + '">' +
+            '<div class="mp-item' + (dis ? ' disabled' : '') + '" data-id="' + m._id + '">' +
             photoHtml(m, 'mp-avatar' + (m.photoFileId ? '' : ' mp-avatar-ph')) +
             '<div class="mp-info">' +
             '<div class="mp-name">' + esc(m.name) + ' <span class="muted">' + esc(m.years) + '</span></div>' +
             '<div class="muted">' + (m.gender === 1 ? '男' : (m.gender === 2 ? '女' : '未知')) + ' · 第' + ((m.generation || 0) + 1) + '世</div>' +
             '</div>' +
-            (selected[m._id] ? '<span class="mp-check">✓</span>' : '') +
             '</div>'
           )
         }).join('')
@@ -125,41 +121,13 @@
         const m = all.find(x => x._id === row.getAttribute('data-id'))
         if (!m) return
         if ((o.exclude || []).indexOf(m._id) >= 0) return
-        if (!o.multi) { finish(m); return }
-        if (selected[m._id]) delete selected[m._id]
-        else selected[m._id] = true
-        const n = Object.keys(selected).length
-        const confirmBtn = sheet.el.querySelector('#mp-confirm')
-        if (confirmBtn) {
-          confirmBtn.disabled = !n
-          confirmBtn.textContent = '确定（已选 ' + n + ' 人）'
-        }
-        renderList()
+        finish(m)
       })
 
       sheet.el.querySelector('#mp-search-input').addEventListener('input', e => {
         keyword = e.target.value || ''
         renderList()
       })
-
-      const confirmBtn = sheet.el.querySelector('#mp-confirm')
-      if (confirmBtn) {
-        confirmBtn.addEventListener('click', () => {
-          finish(all.filter(m => selected[m._id]))
-        })
-      }
-
-      try {
-        const ctx = await window.FamilyAPI.call('getFamilyContext', {})
-        if (!ctx || !ctx.inFamily) { renderList(); return }
-        familyId = ctx.family._id
-        const r = await window.FamilyAPI.call('listMembers', { familyId })
-        all = r.members
-        renderList()
-      } catch (e) {
-        all = []
-        renderList()
-      }
 
       /* ---------- 新建成员并关联 ---------- */
       const newBtn = sheet.el.querySelector('#mp-new')
@@ -205,6 +173,18 @@
           UI.toast(e.message)
         }
       })
+
+      try {
+        const ctx = await window.FamilyAPI.call('getFamilyContext', {})
+        if (!ctx || !ctx.inFamily) { renderList(); return }
+        familyId = ctx.family._id
+        const r = await window.FamilyAPI.call('listMembers', { familyId })
+        all = r.members
+        renderList()
+      } catch (e) {
+        all = []
+        renderList()
+      }
     })
   }
 

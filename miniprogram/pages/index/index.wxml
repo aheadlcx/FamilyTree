@@ -21,7 +21,7 @@
       <view wx:if="{{canManage}}" class="tool-btn" bindtap="goAdmin">
         管理<text wx:if="{{ctx.pendingCount}}" class="badge-dot">{{ctx.pendingCount}}</text>
       </view>
-      <button class="tool-btn tool-share" open-type="share">邀请</button>
+      <button wx:if="{{canManage}}" class="tool-btn tool-share" open-type="share">邀请</button>
     </view>
   </view>
 
