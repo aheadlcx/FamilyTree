@@ -142,6 +142,13 @@
 
         bindTreeEvents(view, ctx, tree.selfMemberId)
       } catch (e) {
+        // 加载失败（云函数未部署/网络等）给出可见的错误态，而不是空白页
+        view.innerHTML =
+          '<div class="empty"><div class="empty-icon">⚠️</div><div>加载失败：' + UI.esc(e.message) + '</div>' +
+          '<div class="muted" style="margin:6px 0 15px;">请确认已部署 api 云函数并开通云环境</div>' +
+          '<button class="btn btn-primary" style="margin:0 40px;" id="i-retry">重试</button></div>'
+        const retry = view.querySelector('#i-retry')
+        if (retry) retry.onclick = () => { retry.disabled = true; this.render() }
         UI.toast(e.message)
       }
     }

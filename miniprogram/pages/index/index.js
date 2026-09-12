@@ -37,6 +37,7 @@ Page({
   data: {
     ready: false,
     noFamily: false,
+    loadError: '',
     ctx: null,
     roots: [],
     total: 0,
@@ -54,7 +55,7 @@ Page({
     return api.call('getFamilyContext', {}).then(ctx => {
       if (!ctx || !ctx.inFamily) {
         app.clearContext()
-        this.setData({ ready: true, noFamily: true, ctx: null })
+        this.setData({ ready: true, noFamily: true, loadError: '', ctx: null })
         return
       }
       app.setContext(ctx)
@@ -63,6 +64,7 @@ Page({
         this.setData({
           ready: true,
           noFamily: false,
+          loadError: '',
           ctx,
           roots: tree.roots,
           total: tree.total,
@@ -74,9 +76,15 @@ Page({
         wx.setNavigationBarTitle({ title: ctx.family.name || '家族族谱' })
       })
     }).catch(e => {
-      this.setData({ ready: true })
+      // 加载失败（网络/云函数未部署等）给出可见的错误态，而不是空白页
+      this.setData({ ready: true, loadError: e.message || '加载失败，请检查云环境配置' })
       api.toastErr(e)
     })
+  },
+
+  retry() {
+    this.setData({ ready: false, loadError: '' })
+    this.refresh()
   },
 
   onPullDownRefresh() {

@@ -1,5 +1,13 @@
+<!-- 加载失败 -->
+<view wx:if="{{ready && loadError}}" class="empty">
+  <view class="empty-icon">⚠️</view>
+  <view>加载失败：{{loadError}}</view>
+  <view class="muted" style="margin: 12rpx 0 30rpx;">请确认已在云开发控制台部署 api 云函数并开通环境</view>
+  <button class="btn btn-primary" style="margin: 0 80rpx;" bindtap="retry">重试</button>
+</view>
+
 <!-- 未加入家族 -->
-<view wx:if="{{ready && noFamily}}" class="empty">
+<view wx:if="{{ready && !loadError && noFamily}}" class="empty">
   <view class="empty-icon">🌳</view>
   <view>你还未加入任何家族</view>
   <view class="muted" style="margin: 12rpx 0 30rpx;">创建家族，或用邀请码加入家人的家族</view>
@@ -7,7 +15,7 @@
 </view>
 
 <!-- 族谱树 -->
-<block wx:if="{{ready && !noFamily && ctx}}">
+<block wx:if="{{ready && !loadError && !noFamily && ctx}}">
   <view class="toolbar">
     <view class="toolbar-left" bindtap="goStats">
       <view class="toolbar-family">{{ctx.family.name}}</view>
